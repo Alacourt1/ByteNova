@@ -3,22 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ByteNova - Soluciones Tecnológicas Innovadoras</title>
+    <title>ByteNova | Soluciones Tecnológicas con Precios Accesibles</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
     <style>
         :root {
             --primary: #6c63ff;
+            --primary-light: #a5b4fc;
             --secondary: #2a2a72;
             --accent: #00c9ff;
+            --warm: #ff9e6d;
+            --success: #4cd97b;
             --light: #f8f9fa;
+            --light-warm: #fff7f0;
             --dark: #1a1a2e;
-            --success: #00d2b5;
+            --text: #444;
             --gradient: linear-gradient(135deg, var(--primary), var(--accent));
-            --card-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            --warm-gradient: linear-gradient(135deg, var(--warm), #ff6b6b);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --border-radius: 16px;
         }
         
         * {
@@ -29,16 +36,21 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
+            background-color: var(--light-warm);
+            color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
         
         .container {
             width: 90%;
             max-width: 1200px;
             margin: 0 auto;
+        }
+        
+        section {
+            padding: 100px 0;
         }
         
         /* Header & Navigation */
@@ -50,6 +62,7 @@
             top: 0;
             z-index: 1000;
             backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
         nav {
@@ -67,12 +80,18 @@
             font-weight: 800;
             font-family: 'Montserrat', sans-serif;
             color: var(--secondary);
+            text-decoration: none;
         }
         
         .logo i {
             color: var(--primary);
             margin-right: 10px;
             font-size: 32px;
+            transition: var(--transition);
+        }
+        
+        .logo:hover i {
+            transform: rotate(15deg);
         }
         
         .nav-links {
@@ -100,7 +119,7 @@
             left: 0;
             width: 0;
             height: 2px;
-            background: var(--gradient);
+            background: var(--warm);
             transition: var(--transition);
         }
         
@@ -113,22 +132,38 @@
         }
         
         .cta-button {
-            background: var(--gradient);
+            background: var(--warm-gradient);
             color: white;
             padding: 12px 28px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
             transition: var(--transition);
-            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(255, 158, 109, 0.4);
             border: none;
             cursor: pointer;
             font-size: 16px;
+            display: inline-block;
         }
         
         .cta-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.6);
+            box-shadow: 0 8px 25px rgba(255, 158, 109, 0.6);
+            background: linear-gradient(135deg, #ff8e4d, #ff5252);
+        }
+        
+        .whatsapp-button {
+            background: #25D366;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .whatsapp-button:hover {
+            background: #128C7E;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(18, 140, 126, 0.5);
         }
         
         /* Hero Section */
@@ -139,6 +174,7 @@
             padding: 120px 0 80px;
             position: relative;
             overflow: hidden;
+            background: linear-gradient(135deg, #fdf2e9 0%, #f0f7ff 100%);
         }
         
         .hero-content {
@@ -155,7 +191,7 @@
         }
         
         .hero-text h1 {
-            font-size: 3.8rem;
+            font-size: 3.3rem;
             line-height: 1.2;
             margin-bottom: 25px;
             font-weight: 800;
@@ -164,10 +200,7 @@
         }
         
         .hero-text h1 span {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: var(--warm);
         }
         
         .hero-text p {
@@ -175,6 +208,13 @@
             margin-bottom: 40px;
             color: #555;
             max-width: 600px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
         }
         
         .hero-image {
@@ -188,9 +228,9 @@
             position: absolute;
             width: 600px;
             height: 600px;
-            background: var(--gradient);
+            background: var(--warm);
             border-radius: 42% 56% 72% 28% / 42% 42% 56% 48%;
-            opacity: 0.15;
+            opacity: 0.1;
             animation: blob-animate 20s linear infinite;
             z-index: -1;
         }
@@ -205,33 +245,51 @@
             width: 100%;
             max-width: 550px;
             position: relative;
-            border-radius: 20px;
+            border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: var(--card-shadow);
             transform: perspective(1000px) rotateY(-5deg);
             transition: var(--transition);
+            background: white;
+            padding: 30px;
+            border: 1px solid rgba(255, 158, 109, 0.2);
         }
         
         .hero-img-container:hover {
             transform: perspective(1000px) rotateY(0deg);
         }
         
-        .hero-img-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            opacity: 0.2;
-            z-index: 1;
+        .hero-img-container .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
         }
         
-        .hero-img-container img {
-            width: 100%;
-            height: auto;
-            display: block;
+        .tech-item {
+            background: #fffaf5;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 158, 109, 0.1);
+        }
+        
+        .tech-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: var(--warm);
+        }
+        
+        .tech-item i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: var(--warm);
+        }
+        
+        .tech-item h3 {
+            font-size: 1rem;
+            color: var(--dark);
+            font-weight: 600;
         }
         
         /* Services Section */
@@ -264,7 +322,7 @@
             transform: translateX(-50%);
             width: 80px;
             height: 4px;
-            background: var(--gradient);
+            background: var(--warm);
             border-radius: 2px;
         }
         
@@ -277,19 +335,19 @@
         
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
         }
         
         .service-card {
             background: white;
-            border-radius: 20px;
+            border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: var(--card-shadow);
             transition: var(--transition);
             padding: 40px 30px;
             text-align: center;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 158, 109, 0.1);
             position: relative;
             z-index: 1;
         }
@@ -301,7 +359,7 @@
             left: 0;
             width: 100%;
             height: 0;
-            background: var(--gradient);
+            background: var(--warm-gradient);
             z-index: -1;
             transition: var(--transition);
             opacity: 0.8;
@@ -309,7 +367,7 @@
         
         .service-card:hover {
             transform: translateY(-15px);
-            border-color: var(--primary);
+            border-color: var(--warm);
         }
         
         .service-card:hover::before {
@@ -323,10 +381,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(108, 99, 255, 0.1);
+            background: rgba(255, 158, 109, 0.1);
             border-radius: 50%;
             font-size: 40px;
-            color: var(--primary);
+            color: var(--warm);
             transition: var(--transition);
         }
         
@@ -351,16 +409,66 @@
         .service-card p {
             color: #666;
             transition: var(--transition);
+            font-size: 1.05rem;
+            margin-bottom: 25px;
         }
         
         .service-card:hover p {
             color: rgba(255, 255, 255, 0.9);
         }
         
+        .price-container {
+            margin: 25px 0;
+            padding: 15px 0;
+            border-top: 1px dashed rgba(255, 158, 109, 0.3);
+            border-bottom: 1px dashed rgba(255, 158, 109, 0.3);
+        }
+        
+        .old-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .new-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 15px;
+        }
+        
+        .service-card:hover .old-price,
+        .service-card:hover .new-price {
+            color: white;
+        }
+        
+        .price-note {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 10px;
+        }
+        
+        .service-card:hover .price-note {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .badge {
+            background: var(--success);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
         /* About Section */
         #about {
             padding: 100px 0;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            background: linear-gradient(135deg, #fdf8f3 0%, #f0f7ff 100%);
             position: relative;
         }
         
@@ -383,29 +491,31 @@
         }
         
         .about-text h2 span {
-            color: var(--primary);
+            color: var(--warm);
         }
         
         .about-text p {
             margin-bottom: 25px;
             font-size: 1.1rem;
             color: #555;
+            line-height: 1.8;
         }
         
         .stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
             margin-top: 40px;
         }
         
         .stat-item {
             text-align: center;
-            padding: 25px 15px;
+            padding: 20px 10px;
             background: white;
-            border-radius: 15px;
+            border-radius: var(--border-radius);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
             transition: var(--transition);
+            border: 1px solid rgba(255, 158, 109, 0.1);
         }
         
         .stat-item:hover {
@@ -414,15 +524,15 @@
         }
         
         .stat-item .number {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            color: var(--primary);
+            color: var(--warm);
             margin-bottom: 10px;
             font-family: 'Montserrat', sans-serif;
         }
         
         .stat-item .label {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #666;
             font-weight: 500;
         }
@@ -433,38 +543,69 @@
         }
         
         .about-img-container {
-            border-radius: 20px;
+            border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: var(--card-shadow);
             position: relative;
+            background: white;
+            padding: 30px;
+            border: 1px solid rgba(255, 158, 109, 0.1);
         }
         
-        .about-img-container img {
-            width: 100%;
-            height: auto;
-            display: block;
+        .client-logos {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 20px;
+        }
+        
+        .client-logo {
+            background: #fffaf5;
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 158, 109, 0.1);
+        }
+        
+        .client-logo:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .client-logo i {
+            font-size: 40px;
+            color: var(--warm);
+        }
+        
+        .client-logo span {
+            font-weight: 700;
+            margin-left: 15px;
+            color: var(--dark);
+            font-size: 1.2rem;
         }
         
         /* Contact Section */
         #contact {
             padding: 100px 0;
-            background: white;
+            background: linear-gradient(to right, #2a2a72, #1a1a2e);
+            color: white;
         }
         
         .contact-container {
             display: flex;
             gap: 50px;
-            background: white;
-            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
             overflow: hidden;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
         }
         
         .contact-info {
             flex: 1;
-            background: var(--gradient);
             padding: 60px 40px;
-            color: white;
         }
         
         .contact-info h2 {
@@ -477,6 +618,8 @@
             margin-bottom: 40px;
             font-size: 1.1rem;
             opacity: 0.9;
+            max-width: 500px;
+            line-height: 1.8;
         }
         
         .contact-details {
@@ -492,7 +635,7 @@
         .contact-icon {
             font-size: 24px;
             margin-right: 15px;
-            color: white;
+            color: var(--warm);
         }
         
         .contact-text h3 {
@@ -508,6 +651,8 @@
         .contact-form {
             flex: 1;
             padding: 60px 40px;
+            background: white;
+            border-radius: var(--border-radius);
         }
         
         .form-group {
@@ -522,7 +667,8 @@
         }
         
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 15px 20px;
             border-radius: 12px;
@@ -533,15 +679,41 @@
         }
         
         .form-group input:focus,
-        .form-group textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--warm);
+            box-shadow: 0 0 0 3px rgba(255, 158, 109, 0.2);
             outline: none;
         }
         
         .form-group textarea {
             min-height: 150px;
             resize: vertical;
+        }
+        
+        /* WhatsApp Float Button */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.5);
+            z-index: 100;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        
+        .whatsapp-float:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.7);
         }
         
         /* Footer */
@@ -573,7 +745,7 @@
             left: 0;
             width: 50px;
             height: 3px;
-            background: var(--accent);
+            background: var(--warm);
         }
         
         .footer-links {
@@ -616,7 +788,7 @@
         }
         
         .social-links a:hover {
-            background: var(--primary);
+            background: var(--warm);
             transform: translateY(-5px);
         }
         
@@ -652,6 +824,10 @@
             .contact-container {
                 flex-direction: column;
             }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
         @media (max-width: 768px) {
@@ -660,7 +836,7 @@
             }
             
             .hero-text h1 {
-                font-size: 3rem;
+                font-size: 2.5rem;
             }
             
             .section-title h2 {
@@ -673,6 +849,22 @@
             
             .stats {
                 grid-template-columns: 1fr;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .hero-img-container .tech-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .price-container {
+                padding: 10px 0;
+            }
+            
+            .new-price {
+                font-size: 1.8rem;
             }
         }
         
@@ -706,21 +898,28 @@
     </style>
 </head>
 <body>
+    <!-- WhatsApp Float Button -->
+    <a href="https://wa.me/543515460263?text=Hola%20necesito%20más%20información" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <!-- Header & Navigation -->
     <header>
         <div class="container">
             <nav>
-                <div class="logo">
+                <a href="#" class="logo">
                     <i class="fas fa-microchip"></i>
                     ByteNova
-                </div>
+                </a>
                 <ul class="nav-links">
                     <li><a href="#hero">Inicio</a></li>
                     <li><a href="#services">Servicios</a></li>
                     <li><a href="#about">Nosotros</a></li>
                     <li><a href="#contact">Contacto</a></li>
                 </ul>
-                <a href="#contact" class="cta-button">Hablemos</a>
+                <a href="https://wa.me/543515460263?text=Hola%20necesito%20más%20información" class="cta-button whatsapp-button" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Hablemos
+                </a>
             </nav>
         </div>
     </header>
@@ -730,17 +929,37 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text animate">
-                    <h1>Transformamos tus ideas en <span>soluciones digitales</span></h1>
-                    <p>En ByteNova desarrollamos sistemas informáticos innovadores, creamos páginas web de alto impacto y aplicaciones móviles que impulsan el crecimiento de tu negocio.</p>
-                    <div style="display: flex; gap: 20px; margin-top: 40px;">
-                        <a href="#services" class="cta-button">Nuestros Servicios</a>
-                        <a href="#contact" class="cta-button" style="background: white; color: var(--primary); border: 2px solid var(--primary);">Contáctanos</a>
+                    <h1>Soluciones tecnológicas <span>con un toque humano</span></h1>
+                    <p>En ByteNova entendemos los desafíos de tu negocio local. Creamos soluciones a medida que se adaptan a tu realidad, con precios accesibles y el trato cercano que mereces.</p>
+                    
+                    <div class="hero-buttons">
+                        <a href="#services" class="cta-button">Ver Servicios y Precios</a>
+                        <a href="https://wa.me/543515460263?text=Hola%20necesito%20más%20información" class="cta-button whatsapp-button" target="_blank">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
                     </div>
                 </div>
                 <div class="hero-image">
                     <div class="hero-blob"></div>
                     <div class="hero-img-container animate delay-1">
-                        <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Desarrollo de Software">
+                        <div class="tech-grid">
+                            <div class="tech-item">
+                                <i class="fas fa-tags"></i>
+                                <h3>Precios Accesibles</h3>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                <h3>Sin Sorpresas</h3>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-gift"></i>
+                                <h3>Ofertas Especiales</h3>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fas fa-heart"></i>
+                                <h3>Hecho con pasión</h3>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -751,30 +970,89 @@
     <section id="services">
         <div class="container">
             <div class="section-title animate">
-                <h2>Nuestros Servicios</h2>
-                <p>Soluciones tecnológicas diseñadas para potenciar tu negocio en la era digital</p>
+                <h2>Nuestros Servicios y Precios</h2>
+                <p>Soluciones pensadas especialmente para pequeños y medianos negocios</p>
             </div>
             <div class="services-grid">
+                <!-- Sistema Personalizado -->
                 <div class="service-card animate delay-1">
                     <div class="service-icon">
                         <i class="fas fa-laptop-code"></i>
                     </div>
-                    <h3>Desarrollo de Sistemas</h3>
-                    <p>Software empresarial personalizado para gestión de procesos, inventario, CRM y más. Soluciones escalables que se adaptan a tus necesidades.</p>
+                    <h3>Sistema Personalizado</h3>
+                    <p>¿Cansado de soluciones genéricas? Creamos sistemas a medida para gestionar tu inventario, clientes y operaciones diarias.</p>
+                    
+                    <div class="price-container">
+                        <div class="old-price">$159.99 USD</div>
+                        <div class="new-price">$99.99 USD</div>
+                        <span class="badge">Ahorra $60</span>
+                    </div>
+                    
+                    <p class="price-note">Precio único por desarrollo completo</p>
+                    <a href="https://wa.me/543515460263?text=Estoy%20interesado%20en%20el%20sistema%20personalizado" class="cta-button" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Solicitar
+                    </a>
                 </div>
+                
+                <!-- Página Web -->
                 <div class="service-card animate delay-2">
                     <div class="service-icon">
                         <i class="fas fa-globe"></i>
                     </div>
-                    <h3>Páginas Web</h3>
-                    <p>Sitios web modernos, responsive y optimizados para SEO. Creamos experiencias digitales que convierten visitantes en clientes.</p>
+                    <h3>Página Web Profesional</h3>
+                    <p>Tu tienda online con el toque humano que tus clientes valoran. Diseños acogedores que transmiten la esencia de tu negocio.</p>
+                    
+                    <div class="price-container">
+                        <div class="old-price">$89.99 USD</div>
+                        <div class="new-price">$49.99 USD</div>
+                        <span class="badge">Oferta especial</span>
+                    </div>
+                    
+                    <p class="price-note">Incluye dominio gratuito (.xyz, .online, etc.)</p>
+                    <p class="price-note">Dominio .com: +$10 USD/año</p>
+                    <a href="https://wa.me/543515460263?text=Estoy%20interesado%20en%20la%20página%20web" class="cta-button" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Solicitar
+                    </a>
                 </div>
+                
+                <!-- Asistente Inteligente -->
                 <div class="service-card animate delay-3">
                     <div class="service-icon">
-                        <i class="fas fa-mobile-alt"></i>
+                        <i class="fas fa-robot"></i>
                     </div>
-                    <h3>Aplicaciones Móviles</h3>
-                    <p>Apps nativas e híbridas para iOS y Android. Diseño intuitivo, alto rendimiento y funcionalidades que tus usuarios amarán.</p>
+                    <h3>Asistente Inteligente</h3>
+                    <p>Automatizamos tareas repetitivas para que puedas enfocarte en lo que más importa: atender a tus clientes.</p>
+                    
+                    <div class="price-container">
+                        <div class="old-price">$189.99 USD</div>
+                        <div class="new-price">$99.99 USD</div>
+                        <span class="badge">Ahorra $90</span>
+                    </div>
+                    
+                    <p class="price-note">Implementación única</p>
+                    <a href="https://wa.me/543515460263?text=Estoy%20interesado%20en%20el%20asistente%20inteligente" class="cta-button" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Solicitar
+                    </a>
+                </div>
+                
+                <!-- Marketing -->
+                <div class="service-card animate">
+                    <div class="service-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3>Marketing Digital</h3>
+                    <p>Estrategias que conectan con tu comunidad local. No somos una agencia fría, entendemos las relaciones personales.</p>
+                    
+                    <div class="price-container">
+                        <div class="old-price">$49.99 USD/mes</div>
+                        <div class="new-price">$25.99 USD/mes</div>
+                        <span class="badge">50% de descuento</span>
+                    </div>
+                    
+                    <p class="price-note">Precio mensual - Sin contratos largos</p>
+                    <a href="https://wa.me/543515460263?text=Estoy%20interesado%20en%20el%20marketing%20digital" class="cta-button" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Solicitar
+                    </a>
                 </div>
             </div>
         </div>
@@ -785,28 +1063,46 @@
         <div class="container">
             <div class="about-content">
                 <div class="about-text animate">
-                    <h2>Impulsamos la <span>innovación digital</span></h2>
-                    <p>En ByteNova combinamos tecnología de vanguardia con un enfoque centrado en el usuario. Nuestro equipo de desarrolladores, diseñadores y expertos en negocios trabajan juntos para crear soluciones que resuelven problemas reales y generan valor.</p>
-                    <p>Nos especializamos en transformar ideas complejas en productos digitales intuitivos y eficientes que superan las expectativas de nuestros clientes.</p>
+                    <h2>Conocemos tu <span>esfuerzo diario</span></h2>
+                    <p>En ByteNova no somos una empresa gigante ni fría. Somos un equipo cercano que entiende los desafíos de administrar un negocio local. Hemos trabajado con panaderías, ferreterías, tiendas de ropa y más, entendiendo que cada negocio tiene su magia particular.</p>
+                    <p>Creemos que la tecnología debe servirte, no complicarte. Por eso ofrecemos soluciones prácticas a precios accesibles, con un trato humano y cercano.</p>
                     
                     <div class="stats">
                         <div class="stat-item">
                             <div class="number">50+</div>
-                            <div class="label">Proyectos Completados</div>
+                            <div class="label">Negocios ayudados</div>
                         </div>
                         <div class="stat-item">
-                            <div class="number">98%</div>
-                            <div class="label">Clientes Satisfechos</div>
+                            <div class="number">100%</div>
+                            <div class="label">Comprometidos contigo</div>
                         </div>
                         <div class="stat-item">
                             <div class="number">5+</div>
-                            <div class="label">Años de Experiencia</div>
+                            <div class="label">Años acompañando</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="number">1</div>
+                            <div class="label">Familia ByteNova</div>
                         </div>
                     </div>
                 </div>
                 <div class="about-image">
                     <div class="about-img-container animate delay-1">
-                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80" alt="Equipo ByteNova">
+                        <h3 style="text-align: center; margin-bottom: 25px; color: var(--dark);">Negocios como el tuyo que confían en nosotros</h3>
+                        <div class="client-logos">
+                            <div class="client-logo">
+                                <i class="fas fa-store"></i>
+                                <span>Tu Panadería de Barrio</span>
+                            </div>
+                            <div class="client-logo">
+                                <i class="fas fa-tshirt"></i>
+                                <span>Boutique Familiar</span>
+                            </div>
+                            <div class="client-logo">
+                                <i class="fas fa-tools"></i>
+                                <span>Ferretería Don José</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -817,24 +1113,15 @@
     <section id="contact">
         <div class="container">
             <div class="section-title animate">
-                <h2>Contáctanos</h2>
-                <p>¿Listo para llevar tu negocio al siguiente nivel? ¡Hablemos!</p>
+                <h2>Hablemos de tu proyecto</h2>
+                <p>Estamos aquí para ayudarte, no para venderte</p>
             </div>
             <div class="contact-container animate delay-1">
                 <div class="contact-info">
-                    <h2>Transformemos tu visión en realidad</h2>
-                    <p>Nuestro equipo está listo para escuchar tus ideas y crear soluciones tecnológicas a medida para tu negocio.</p>
+                    <h2>Conversemos como vecinos</h2>
+                    <p>En ByteNova creemos en el trato personal. Cuéntanos sobre tu negocio, tus desafíos y tus sueños. Juntos encontraremos la mejor solución para ti.</p>
                     
                     <div class="contact-details">
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-phone"></i>
-                            </div>
-                            <div class="contact-text">
-                                <h3>Teléfono</h3>
-                                <p>+54 351 5460263</p>
-                            </div>
-                        </div>
                         <div class="contact-item">
                             <div class="contact-icon">
                                 <i class="fas fa-envelope"></i>
@@ -844,31 +1131,50 @@
                                 <p>agustinmitrano@gmail.com</p>
                             </div>
                         </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h3>Horario</h3>
+                                <p>Lunes-Viernes: 9:00 - 18:00</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h3>Conversemos</h3>
+                                <p>Primera consulta sin costo</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="contact-form">
                     <form>
                         <div class="form-group">
-                            <label for="name">Nombre completo</label>
-                            <input type="text" id="name" placeholder="Ingresa tu nombre" required>
+                            <label for="name">Tu nombre</label>
+                            <input type="text" id="name" placeholder="¿Cómo te llamas?" required>
                         </div>
                         <div class="form-group">
-                            <label for="email">Correo electrónico</label>
-                            <input type="email" id="email" placeholder="Ingresa tu email" required>
+                            <label for="email">Tu correo</label>
+                            <input type="email" id="email" placeholder="¿Dónde te contactamos?" required>
                         </div>
                         <div class="form-group">
-                            <label for="service">Servicio de interés</label>
+                            <label for="service">¿Qué servicio te interesa?</label>
                             <select id="service" class="form-control">
-                                <option value="">Selecciona un servicio</option>
-                                <option value="web">Desarrollo Web</option>
-                                <option value="app">Aplicaciones Móviles</option>
-                                <option value="system">Sistemas Informáticos</option>
-                                <option value="consulting">Consultoría</option>
+                                <option value="">Selecciona una opción</option>
+                                <option value="system">Sistema Personalizado ($99.99)</option>
+                                <option value="web">Página Web Profesional ($49.99)</option>
+                                <option value="ia">Asistente Inteligente ($99.99)</option>
+                                <option value="marketing">Marketing Digital ($25.99/mes)</option>
+                                <option value="other">Algo diferente</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="message">Mensaje</label>
-                            <textarea id="message" placeholder="Cuéntanos sobre tu proyecto..."></textarea>
+                            <label for="message">Cuéntanos sobre tu negocio</label>
+                            <textarea id="message" placeholder="¿Qué haces? ¿Qué desafíos enfrentas? ¿Cómo soñás tu negocio?"></textarea>
                         </div>
                         <button type="submit" class="cta-button">Enviar Mensaje</button>
                     </form>
@@ -886,7 +1192,7 @@
                         <i class="fas fa-microchip"></i>
                         ByteNova
                     </div>
-                    <p style="color: #aaa; margin-bottom: 25px;">Transformando ideas en soluciones digitales innovadoras que impulsan el crecimiento de tu negocio.</p>
+                    <p style="color: #aaa; margin-bottom: 25px;">Tecnología con calidez para negocios con corazón</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -901,32 +1207,28 @@
                         <li><a href="#services">Servicios</a></li>
                         <li><a href="#about">Nosotros</a></li>
                         <li><a href="#contact">Contacto</a></li>
-                        <li><a href="#">Portafolio</a></li>
-                        <li><a href="#">Blog</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Servicios</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Desarrollo Web</a></li>
-                        <li><a href="#">Aplicaciones Móviles</a></li>
-                        <li><a href="#">Sistemas Empresariales</a></li>
-                        <li><a href="#">Diseño UI/UX</a></li>
-                        <li><a href="#">Consultoría Tecnológica</a></li>
-                        <li><a href="#">Mantenimiento</a></li>
+                        <li><a href="#">Sistema Personalizado $99.99</a></li>
+                        <li><a href="#">Página Web $49.99</a></li>
+                        <li><a href="#">Asistente Inteligente $99.99</a></li>
+                        <li><a href="#">Marketing Digital $25.99/mes</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Contacto</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-phone"></i> +54 351 5460263</li>
                         <li><i class="fas fa-envelope"></i> agustinmitrano@gmail.com</li>
                         <li><i class="fas fa-clock"></i> Lunes-Viernes: 9:00-18:00</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Córdoba, Argentina</li>
                     </ul>
                 </div>
             </div>
             <div class="copyright">
-                &copy; 2023 ByteNova. Todos los derechos reservados.
+                &copy; 2023 ByteNova. Tecnología con alma para tu negocio.
             </div>
         </div>
     </footer>
@@ -987,7 +1289,7 @@
                     e.preventDefault();
                     
                     // Aquí iría el código para enviar el formulario
-                    alert('¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.');
+                    alert('¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto para conversar sobre tu negocio.');
                     contactForm.reset();
                 });
             }
