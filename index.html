@@ -904,33 +904,33 @@
     </div>
     
     <!-- Admin System -->
-    <div id="admin-system" class="admin-panel hidden">
-        <header class="admin-header">
-            <div class="container header-content">
-                <div class="logo">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZDMzZjJmIiBkPSJNMjU2IDUxMmMtNjguMzggMC0xMzIuNy0yNi42OS0xODAuOTktNzQuOTlTMCAzMjQuMzggMCAyNTZTMjYuNjkgMTIzLjMgNzQuOTkgNzQuOTlTMTg3LjYyIDAgMjU2IDBzMTMyLjcgMjYuNjkgMTgwLjk5IDc0Ljk5UzUxMiAxODcuNjIgNTEyIDI1NnMtMjYuNjkgMTMyLjctNzQuOTkgMTgwLjk5UzMyNC4zOCA1MTIgMjU2IDUxMnpNMTQ0IDI3Mmg3MnY3MmgtNzJWMjcyem0xNTIgMGg3MnY3MmgtNzJWMjcyeiIvPjwvc3ZnPg==" alt="Logo Bomberos">
-                    <h1>Panel de Administración</h1>
-                </div>
-                <div class="user-info">
-                    <div class="user-details">
-                        <p class="user-name" id="admin-user-name">Administrador</p>
-                        <p class="user-rank">Panel de Control</p>
-                    </div>
-                    <button id="admin-logout-btn" class="btn-sm"><i class="fas fa-sign-out-alt"></i> Salir</button>
-                </div>
+   <!-- HEADER MINIMALISTA -->
+<header class="admin-header minimalista">
+    <div class="container header-content">
+        <div class="logo">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZDMzZjJmIiBkPSJNMjU2IDUxMmMtNjguMzggMC0xMzIuNy0yNi42OS0xODAuOTktNzQuOTlTMCAzMjQuMzggMCAyNTZTMjYuNjkgMTIzLjMgNzQuOTkgNzQuOTlTMTg3LjYyIDAgMjU2IDBzMTMyLjcgMjYuNjkgMTgwLjk5IDc0Ljk5UzUxMiAxODcuNjIgNTEyIDI1NnMtMjYuNjkgMTMyLjctNzQuOTkgMTgwLjk5UzMyNC4zOCA1MTIgMjU2IDUxMnpNMTQ0IDI3Mmg3MnY3MmgtNzJWMjcyem0xNTIgMGg3MnY3MmgtNzJWMjcyeiIvPjwvc3ZnPg==" alt="Logo Bomberos">
+            <h1>Panel Admin</h1>
+        </div>
+        <div class="user-info">
+            <div class="user-details">
+                <p class="user-name" id="admin-user-name">Administrador</p>
+                <p class="user-rank">Sistema</p>
             </div>
-        </header>
-        
-        <nav class="admin-nav">
-            <div class="container">
-                <ul class="nav-links">
-                    <li><a href="#admin-dashboard" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li><a href="#admin-personal" class="nav-link"><i class="fas fa-users"></i> Gestión de Personal</a></li>
-                    <li><a href="#admin-historico" class="nav-link"><i class="fas fa-clipboard-list"></i> Histórico Completo</a></li>
-                    <li><a href="#admin-alertas" class="nav-link"><i class="fas fa-bell"></i> Alertas <span id="admin-notification-count" class="notification-badge hidden">0</span></a></li>
-                </ul>
-            </div>
-        </nav>
+            <button id="admin-logout-btn" class="btn-sm"><i class="fas fa-sign-out-alt"></i> Salir</button>
+        </div>
+    </div>
+</header>
+       <!-- MENÚ MINIMALISTA -->
+<nav class="admin-nav minimalista">
+    <div class="container">
+        <ul class="nav-links">
+            <li><a href="#admin-dashboard" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="#admin-personal" class="nav-link"><i class="fas fa-users"></i> Personal</a></li>
+            <li><a href="#admin-historico" class="nav-link"><i class="fas fa-history"></i> Historial</a></li>
+            <li><a href="#admin-alertas" class="nav-link"><i class="fas fa-bell"></i> Alertas <span id="admin-notification-count" class="notification-badge hidden">0</span></a></li>
+        </ul>
+    </div>
+</nav>
         
         <main class="container">
             <div id="admin-alert-container"></div>
@@ -1203,13 +1203,15 @@
                     });
                 });
                 
-                // Navegación admin
-                document.querySelectorAll('#admin-system .nav-link').forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const target = link.getAttribute('href').substring(6); // Remover "admin-"
-                        this.cambiarSeccionAdmin(target);
-                    });
+              // Navegación admin - CORREGIDA
+document.querySelectorAll('#admin-system .nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = link.getAttribute('href');
+        // Extraer correctamente el nombre de la sección (remover #admin-)
+        const target = href.replace('#admin-', '');
+        this.cambiarSeccionAdmin(target);
+    });
                 });
                 
                 // Formularios
@@ -1357,37 +1359,44 @@
                 }
             },
             
-            cambiarSeccionAdmin(seccion) {
-                // Actualizar navegación
-                document.querySelectorAll('#admin-system .nav-link').forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#admin-${seccion}`) {
-                        link.classList.add('active');
-                    }
-                });
-                
-                // Ocultar todas las secciones
-                document.querySelectorAll('#admin-system .tab-content').forEach(sec => {
-                    sec.classList.add('hidden');
-                });
-                
-                // Mostrar sección seleccionada
-                const seccionElement = document.getElementById(`admin-${seccion}`);
-                if (seccionElement) {
-                    seccionElement.classList.remove('hidden');
-                }
-                
-                // Cargar datos específicos
-                if (seccion === 'personal') {
-                    this.cargarUsuariosAdmin();
-                } else if (seccion === 'historico') {
-                    this.cargarHistoricoCompleto();
-                } else if (seccion === 'alertas') {
-                    this.cargarAlertasAdmin();
-                } else if (seccion === 'dashboard') {
-                    this.actualizarDashboardAdmin();
-                }
-            },
+           cambiarSeccionAdmin(seccion) {
+    console.log('Cambiando a sección:', seccion);
+    
+    // Actualizar navegación
+    document.querySelectorAll('#admin-system .nav-link').forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href');
+        if (href === `#admin-${seccion}`) {
+            link.classList.add('active');
+        }
+    });
+    
+    // Ocultar todas las secciones
+    document.querySelectorAll('#admin-system .tab-content').forEach(sec => {
+        sec.classList.add('hidden');
+    });
+    
+    // Mostrar sección seleccionada
+    const seccionElement = document.getElementById(`admin-${seccion}`);
+    if (seccionElement) {
+        seccionElement.classList.remove('hidden');
+    }
+    
+    // Cargar datos específicos
+    switch(seccion) {
+        case 'dashboard':
+            this.actualizarDashboardAdmin();
+            break;
+        case 'personal':
+            this.cargarUsuariosAdmin();
+            break;
+        case 'historico':
+            this.cargarHistoricoCompleto();
+            break;
+        case 'alertas':
+            this.cargarAlertasAdmin();
+            break;
+    }
             
             registrarIngreso() {
                 const legajo = document.getElementById('legajo').value;
