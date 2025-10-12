@@ -99,6 +99,7 @@
     margin-bottom:6px;
     font-weight:600;
     font-size:14px;
+    position: relative;
   }
   nav a.active{background:var(--glass); color:var(--accent)}
 
@@ -147,6 +148,19 @@
   .badge.success{background:rgba(16,185,129,0.12); color:var(--success)}
   .badge.warn{background:rgba(245,158,11,0.08); color:#b45309}
   .badge.info{background:rgba(15,98,254,0.08); color:var(--accent)}
+  .badge.notification {
+    position: absolute;
+    right: 10px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
 
   /* popup (simple) */
   .popup{
@@ -247,16 +261,26 @@
     <!-- APP (visible cuando logueado) -->
     <div id="app" class="main" style="display:none">
       <nav class="sidebar" aria-label="Navegación principal">
-        <a href="#dashboard" class="nav-link active"><i class="fas fa-chart-bar"></i> Dashboard</a>
-        <a href="#ingreso" class="nav-link"><i class="fas fa-sign-in-alt"></i> Registrar ingreso</a>
-        <a href="#salida" class="nav-link"><i class="fas fa-sign-out-alt"></i> Registrar salida</a>
-        <a href="#historial" class="nav-link"><i class="fas fa-history"></i> Historial personal</a>
-        <a href="#novedades" class="nav-link"><i class="fas fa-bullhorn"></i> Novedades</a>
-        <hr style="border:none;height:8px">
-        <a href="#admin-dashboard" class="nav-link admin-only"><i class="fas fa-cog"></i> Admin — Dashboard</a>
-        <a href="#admin-users" class="nav-link admin-only"><i class="fas fa-users"></i> Usuarios</a>
-        <a href="#admin-actividades" class="nav-link admin-only"><i class="fas fa-list"></i> Actividades</a>
-        <a href="#admin-novedades" class="nav-link admin-only"><i class="fas fa-bullhorn"></i> Admin — Novedades</a>
+        <!-- Menú para usuarios regulares -->
+        <div class="user-only">
+          <a href="#dashboard" class="nav-link active"><i class="fas fa-chart-bar"></i> Dashboard</a>
+          <a href="#ingreso" class="nav-link"><i class="fas fa-sign-in-alt"></i> Registrar ingreso</a>
+          <a href="#salida" class="nav-link"><i class="fas fa-sign-out-alt"></i> Registrar salida</a>
+          <a href="#historial" class="nav-link"><i class="fas fa-history"></i> Historial personal</a>
+          <a href="#novedades" class="nav-link" id="novedades-link">
+            <i class="fas fa-bullhorn"></i> Novedades
+            <span class="badge notification" id="novedades-badge" style="display:none">0</span>
+          </a>
+        </div>
+        
+        <!-- Menú para administradores -->
+        <div class="admin-only">
+          <hr style="border:none;height:8px;margin:12px 0">
+          <a href="#admin-dashboard" class="nav-link"><i class="fas fa-cog"></i> Panel de Control</a>
+          <a href="#admin-users" class="nav-link"><i class="fas fa-users"></i> Gestión de Usuarios</a>
+          <a href="#admin-actividades" class="nav-link"><i class="fas fa-list"></i> Actividades</a>
+          <a href="#admin-novedades" class="nav-link"><i class="fas fa-bullhorn"></i> Gestión de Novedades</a>
+        </div>
       </nav>
 
       <main class="panel">
@@ -369,7 +393,7 @@
 
         <!-- ADMIN: DASHBOARD -->
         <section id="admin-dashboard" class="tab card" style="display:none">
-          <h3>Admin — Resumen</h3>
+          <h3>Panel de Control - Administración</h3>
           <div style="display:flex;gap:12px;margin-top:10px">
             <div class="card" style="padding:12px">
               <div class="muted">Total usuarios</div>
@@ -383,12 +407,16 @@
               <div class="muted">Actividades</div>
               <div id="total-actividades" class="value-large">0</div>
             </div>
+            <div class="card" style="padding:12px">
+              <div class="muted">Novedades</div>
+              <div id="total-novedades" class="value-large">0</div>
+            </div>
           </div>
         </section>
 
         <!-- ADMIN: USUARIOS -->
         <section id="admin-users" class="tab card" style="display:none">
-          <h3>Usuarios</h3>
+          <h3>Gestión de Usuarios</h3>
 
           <form id="add-user-form" style="max-width:520px">
             <div class="row">
@@ -436,7 +464,7 @@
 
         <!-- ADMIN: ACTIVIDADES -->
         <section id="admin-actividades" class="tab card" style="display:none">
-          <h3>Actividades</h3>
+          <h3>Gestión de Actividades</h3>
 
           <form id="add-actividad-form" style="max-width:520px">
             <div style="display:flex;gap:8px">
@@ -455,7 +483,7 @@
 
         <!-- ADMIN: NOVEDADES -->
         <section id="admin-novedades" class="tab card" style="display:none">
-          <h3>Admin — Novedades</h3>
+          <h3>Gestión de Novedades</h3>
           <p class="muted" style="margin-bottom:16px">Crear y gestionar novedades para todos los usuarios</p>
 
           <form id="add-novedad-form" style="max-width:600px; margin-bottom: 20px;">
@@ -606,7 +634,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if(id === 'admin-users') cargarUsuarios();
       if(id === 'admin-actividades') cargarActividadesAdmin();
       if(id === 'admin-dashboard') actualizarAdminDashboard();
-      if(id === 'novedades') cargarNovedades();
+      if(id === 'novedades') {
+        cargarNovedades();
+        // Resetear notificaciones cuando el usuario visita la sección de novedades
+        if (!usuarioActual.admin) {
+          document.getElementById('novedades-badge').style.display = 'none';
+        }
+      }
       if(id === 'admin-novedades') cargarNovedadesAdmin();
     });
   });
@@ -642,20 +676,36 @@ function abrirAppSegunRol(){
   document.getElementById('legajo').value = usuarioActual.legajo || '';
   document.getElementById('legajo-salida').value = usuarioActual.legajo || '';
 
-  // mostrar/ocultar opciones admin
+  // mostrar/ocultar opciones según rol
   document.querySelectorAll('.admin-only').forEach(el=>{
-    el.style.display = usuarioActual.admin ? 'flex' : 'none';
+    el.style.display = usuarioActual.admin ? 'block' : 'none';
+  });
+  
+  document.querySelectorAll('.user-only').forEach(el=>{
+    el.style.display = usuarioActual.admin ? 'none' : 'block';
   });
 
   // por defecto abrir dashboard
   document.querySelectorAll('.tab').forEach(t=> t.style.display='none');
-  document.getElementById('dashboard').style.display = 'block';
-  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-  document.querySelector('a[href="#dashboard"]').classList.add('active');
+  
+  if (usuarioActual.admin) {
+    document.getElementById('admin-dashboard').style.display = 'block';
+    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+    document.querySelector('a[href="#admin-dashboard"]').classList.add('active');
+  } else {
+    document.getElementById('dashboard').style.display = 'block';
+    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+    document.querySelector('a[href="#dashboard"]').classList.add('active');
+  }
 
   actualizarDashboard();
   cargarActividades();
   actualizarAdminDashboard();
+  
+  // Actualizar notificación de novedades para usuarios regulares
+  if (!usuarioActual.admin) {
+    actualizarNotificacionNovedades();
+  }
 }
 
 /* ===========================
@@ -1048,6 +1098,9 @@ function agregarNovedad(e){
   document.getElementById('add-novedad-form').reset();
   cargarNovedadesAdmin();
   
+  // Actualizar notificación para usuarios
+  actualizarNotificacionNovedades();
+  
   // Si estamos en la sección de novedades, actualizarla también
   if(document.getElementById('novedades').style.display === 'block') {
     cargarNovedades();
@@ -1062,9 +1115,27 @@ function eliminarNovedad(id){
   mostrarPopup('Novedad eliminada','success');
   cargarNovedadesAdmin();
   
+  // Actualizar notificación para usuarios
+  actualizarNotificacionNovedades();
+  
   // Si estamos en la sección de novedades, actualizarla también
   if(document.getElementById('novedades').style.display === 'block') {
     cargarNovedades();
+  }
+}
+
+/* ===========================
+   Notificaciones de Novedades
+   =========================== */
+function actualizarNotificacionNovedades() {
+  if (usuarioActual && !usuarioActual.admin) {
+    const badge = document.getElementById('novedades-badge');
+    if (novedades.length > 0) {
+      badge.textContent = novedades.length;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
   }
 }
 
@@ -1083,6 +1154,7 @@ function actualizarAdminDashboard(){
   document.getElementById('total-usuarios').textContent = usuarios.filter(u=>!u.admin).length;
   document.getElementById('total-registros').textContent = registros.length;
   document.getElementById('total-actividades').textContent = actividades.length;
+  document.getElementById('total-novedades').textContent = novedades.length;
 }
 
 /* ===========================
