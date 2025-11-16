@@ -1,1215 +1,2874 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Bomberos — Sistema (Minimal)</title>
-
-<!-- Iconos FontAwesome -->
-<script src="https://kit.fontawesome.com/a2e0b6c15a.js" crossorigin="anonymous"></script>
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-  :root{
-    --bg:#f7f8fa;
-    --card:#ffffff;
-    --muted:#6b7280;
-    --accent:#0f62fe; /* azul */
-    --danger:#ef4444;
-    --success:#10b981;
-    --glass: rgba(15,98,254,0.06);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{
-    background:var(--bg);
-    color:#111827;
-    -webkit-font-smoothing:antialiased;
-    padding:18px;
-  }
-
-  /* Contenedor */
-  .wrap{
-    max-width:1100px;
-    margin:0 auto;
-  }
-
-  /* Header */
-  header.appbar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom:18px;
-  }
-  .brand{
-    display:flex;
-    gap:12px;
-    align-items:center;
-  }
-  .brand h1{font-size:18px; font-weight:600;}
-  .brand p{color:var(--muted); font-size:13px; margin-top:2px;}
-
-  /* Simple top actions */
-  .top-actions{display:flex; gap:8px; align-items:center;}
-  .btn{
-    background:var(--accent);
-    color:white;
-    border:none;
-    padding:8px 10px;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:600;
-    font-size:13px;
-  }
-  .btn.ghost{
-    background:transparent;
-    color:var(--accent);
-    border:1px solid rgba(15,98,254,0.12);
-  }
-  .btn.warn{background:var(--danger)}
-  .btn.small{padding:6px 8px; font-size:12px; border-radius:6px}
-
-  /* Layout con nav lateral simple (minimal) */
-  .main{
-    display:grid;
-    grid-template-columns: 260px 1fr;
-    gap:18px;
-  }
-
-  nav.sidebar{
-    background:var(--card);
-    border-radius:10px;
-    padding:12px;
-    border:1px solid #eef2ff;
-    height:calc(100vh - 140px);
-    position:sticky;
-    top:20px;
-  }
-  nav a{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    padding:10px;
-    border-radius:8px;
-    color:var(--muted);
-    text-decoration:none;
-    margin-bottom:6px;
-    font-weight:600;
-    font-size:14px;
-    position: relative;
-  }
-  nav a.active{background:var(--glass); color:var(--accent)}
-
-  /* Contenido principal */
-  .panel{
-    background:transparent;
-  }
-  .card{
-    background:var(--card);
-    border-radius:10px;
-    padding:16px;
-    margin-bottom:12px;
-    border:1px solid rgba(2,6,23,0.04);
-  }
-
-  /* minimal forms */
-  form input, form select, form textarea {
-    width:100%;
-    padding:10px 12px;
-    border:1px solid #e6edf8;
-    border-radius:8px;
-    font-size:14px;
-    margin-top:8px;
-    background:transparent;
-  }
-  label{font-size:13px; color:var(--muted); display:block; margin-top:8px}
-  form .row{display:flex; gap:8px;}
-  .row .col{flex:1}
-
-  /* tabla compacta */
-  table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:14px;
-  }
-  th,td{padding:10px; text-align:left; border-bottom:1px solid #f1f5f9}
-  th{font-weight:700; color:var(--muted); font-size:13px}
-
-  .muted{color:var(--muted); font-size:13px}
-  .value-large{font-size:20px; font-weight:700; color:var(--accent)}
-
-  /* badges */
-  .badge{
-    display:inline-block; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:700;
-  }
-  .badge.success{background:rgba(16,185,129,0.12); color:var(--success)}
-  .badge.warn{background:rgba(245,158,11,0.08); color:#b45309}
-  .badge.info{background:rgba(15,98,254,0.08); color:var(--accent)}
-  .badge.notification {
-    position: absolute;
-    right: 10px;
-    background: var(--danger);
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-  }
-
-  /* popup (simple) */
-  .popup{
-    position:fixed; right:18px; bottom:18px;
-    background:#111827; color:white; padding:10px 14px; border-radius:10px; z-index:999;
-    box-shadow:0 6px 18px rgba(2,6,23,0.08);
-  }
-
-  /* Novedades */
-  .novedad-card {
-    background: var(--card);
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 12px;
-    border: 1px solid rgba(2,6,23,0.04);
-    position: relative;
-  }
-  .novedad-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
-  }
-  .novedad-titulo {
-    font-weight: 600;
-    font-size: 16px;
-    color: #111827;
-  }
-  .novedad-fecha {
-    color: var(--muted);
-    font-size: 12px;
-    white-space: nowrap;
-  }
-  .novedad-contenido {
-    color: #374151;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-  .novedad-eliminar {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: transparent;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .novedad-eliminar:hover {
-    color: var(--danger);
-  }
-
-  /* responsive */
-  @media (max-width:900px){
-    .main{grid-template-columns:1fr; }
-    nav.sidebar{height:auto; position:relative}
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TuCasa App - Encuentra tu hogar ideal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1A5276; /* Azul oscuro elegante */
+            --secondary: #E67E22; /* Naranja cálido y acogedor */
+            --accent: #27AE60; /* Verde para elementos de éxito */
+            --dark: #2C3E50; /* Azul grisáceo oscuro */
+            --light: #FFFFFF;
+            --gray: #F8F9FA;
+            --success: #27AE60;
+            --danger: #E74C3C;
+            --warning: #F39C12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--gray);
+            color: var(--dark);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--light);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            color: var(--secondary);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--light);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--light);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: var(--light);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--light);
+        }
+        
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(26, 82, 118, 0.8), rgba(26, 82, 118, 0.7)), url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            color: var(--light);
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .search-bar {
+            display: flex;
+            background-color: var(--light);
+            border-radius: 5px;
+            overflow: hidden;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            outline: none;
+        }
+        
+        .search-bar button {
+            background-color: var(--secondary);
+            color: var(--light);
+            border: none;
+            padding: 0 25px;
+            cursor: pointer;
+        }
+        
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+        
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        /* Properties Section */
+        .section-title {
+            text-align: center;
+            margin: 60px 0 40px;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .section-title p {
+            color: var(--dark);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .property-card {
+            background-color: var(--light);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            position: relative;
+        }
+        
+        .property-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .property-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 2;
+        }
+        
+        .badge-sale {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .badge-rent {
+            background-color: var(--secondary);
+            color: var(--light);
+        }
+        
+        .property-image {
+            height: 200px;
+            width: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .property-details {
+            padding: 20px;
+        }
+        
+        .property-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .property-address {
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .property-features {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .property-features span {
+            display: flex;
+            align-items: center;
+        }
+        
+        .property-owner {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .owner-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        .owner-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        
+        .owner-info p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .contact-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* Login Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: var(--light);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        
+        .modal-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+        }
+        
+        .btn-full {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+        }
+        
+        .social-login {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: var(--light);
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .social-btn img {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .phone-verification {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            margin: 40px 0;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .dashboard-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .dashboard-content {
+            display: none;
+        }
+        
+        .dashboard-content.active {
+            display: block;
+        }
+        
+        .my-properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .property-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .property-actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .chart-container {
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .viewers-list {
+            background-color: var(--light);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .viewer-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .viewer-item:last-child {
+            border-bottom: none;
+        }
+        
+        .viewer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .viewer-info {
+            flex: 1;
+        }
+        
+        .viewer-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .viewer-info p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .viewer-date {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        /* Profile Section */
+        .profile {
+            display: none;
+            margin: 40px 0;
+        }
+        
+        .profile-header {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .profile-info h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .profile-info p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .profile-stat .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .profile-stat .label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .profile-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Chat System */
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background-color: var(--light);
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+        }
+        
+        .chat-header {
+            background-color: var(--primary);
+            color: var(--light);
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .chat-close {
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .message-sent {
+            align-self: flex-end;
+            background-color: var(--primary);
+            color: var(--light);
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message-received {
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            color: var(--dark);
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .chat-input button {
+            background-color: var(--primary);
+            color: var(--light);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary);
+            color: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        
+        .chat-toggle span {
+            font-size: 24px;
+        }
+        
+        .chat-list {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            background-color: var(--light);
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .chat-list-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+        }
+        
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .chat-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .chat-item-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .chat-item-info {
+            flex: 1;
+        }
+        
+        .chat-item-info h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .chat-item-info p {
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-item-time {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--light);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #444;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                margin: 20px 0;
+            }
+            
+            .hero h2 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .search-bar input {
+                margin-bottom: 10px;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .dashboard-header .btn {
+                margin-top: 15px;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .chat-container {
+                width: 100%;
+                height: 100%;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
+            }
+            
+            .chat-list {
+                width: 100%;
+                bottom: 70px;
+                right: 0;
+                border-radius: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-
-    <header class="appbar">
-      <div class="brand">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" style="border-radius:8px;background:linear-gradient(180deg,#e6f2ff,#ffffff);padding:6px">
-          <path d="M12 2L3 7v5c0 5 3 9 9 10 6-1 9-5 9-10V7l-9-5z" fill="#0f62fe"></path>
-        </svg>
-        <div>
-          <h1>Bomberos — Control de Guardias</h1>
-          <p class="muted">Minimal · local (sin servidor) · listo para pruebas</p>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <h1>TU<span>CASA</span></h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" id="inicioLink">Inicio</a></li>
+                    <li><a href="#" id="propiedadesLink">Propiedades</a></li>
+                    <li><a href="#" id="venderLink">Vender</a></li>
+                    <li><a href="#" id="profileLink">Perfil</a></li>
+                    <li><a href="#" id="dashboardLink" style="display: none;">Panel de Control</a></li>
+                </ul>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn">Iniciar Sesión</button>
+                    <button class="btn btn-primary" id="registerBtn">Registrarse</button>
+                </div>
+            </nav>
         </div>
-      </div>
-
-      <div class="top-actions">
-        <div id="session-info" class="muted">No conectado</div>
-        <button class="btn ghost small" id="btn-export">Exportar CSV</button>
-        <button class="btn warn small" id="logout-top" title="Cerrar sesión"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
-      </div>
     </header>
 
-    <!-- LOGIN -->
-    <div id="login-screen" class="card">
-      <h2 style="margin-bottom:8px">Iniciar sesión</h2>
-      <p class="muted" style="margin-bottom:8px">Usa el admin por defecto: <strong>admin / admin</strong> (cámbialo luego)</p>
-      <form id="login-form" autocomplete="off">
-        <label for="login-user">Usuario</label>
-        <input id="login-user" aria-label="Usuario" required />
-        <label for="login-password">Contraseña</label>
-        <input id="login-password" type="password" aria-label="Contraseña" required />
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn" type="submit"><i class="fas fa-sign-in-alt"></i>&nbsp;Ingresar</button>
-          <button id="demo-user" type="button" class="btn ghost small">Ingresar demo</button>
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Encuentra tu hogar ideal</h2>
+                <p>Miles de propiedades en venta y alquiler para que encuentres el lugar perfecto</p>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Buscar por ubicación...">
+                    <div class="suggestions" id="suggestions"></div>
+                    <button class="btn btn-secondary" id="searchBtn">Buscar</button>
+                </div>
+            </div>
         </div>
-      </form>
-      <div id="login-error" class="muted" style="margin-top:10px;color:var(--danger);display:none"></div>
-    </div>
+    </section>
 
-    <!-- APP (visible cuando logueado) -->
-    <div id="app" class="main" style="display:none">
-      <nav class="sidebar" aria-label="Navegación principal">
-        <!-- Menú para usuarios regulares -->
-        <div class="user-only">
-          <a href="#dashboard" class="nav-link active"><i class="fas fa-chart-bar"></i> Dashboard</a>
-          <a href="#ingreso" class="nav-link"><i class="fas fa-sign-in-alt"></i> Registrar ingreso</a>
-          <a href="#salida" class="nav-link"><i class="fas fa-sign-out-alt"></i> Registrar salida</a>
-          <a href="#historial" class="nav-link"><i class="fas fa-history"></i> Historial personal</a>
-          <a href="#novedades" class="nav-link" id="novedades-link">
-            <i class="fas fa-bullhorn"></i> Novedades
-            <span class="badge notification" id="novedades-badge" style="display:none">0</span>
-          </a>
+    <!-- Dashboard Section (solo visible para usuarios logueados) -->
+    <section class="dashboard container" id="dashboard">
+        <div class="dashboard-header">
+            <h2>Mi Panel de Control</h2>
+            <button class="btn btn-secondary" id="addPropertyBtn">Agregar Propiedad</button>
         </div>
         
-        <!-- Menú para administradores -->
-        <div class="admin-only">
-          <hr style="border:none;height:8px;margin:12px 0">
-          <a href="#admin-dashboard" class="nav-link"><i class="fas fa-cog"></i> Panel de Control</a>
-          <a href="#admin-users" class="nav-link"><i class="fas fa-users"></i> Gestión de Usuarios</a>
-          <a href="#admin-actividades" class="nav-link"><i class="fas fa-list"></i> Actividades</a>
-          <a href="#admin-novedades" class="nav-link"><i class="fas fa-bullhorn"></i> Gestión de Novedades</a>
+        <div class="dashboard-tabs">
+            <div class="dashboard-tab active" data-tab="myProperties">Mis Propiedades</div>
+            <div class="dashboard-tab" data-tab="statistics">Estadísticas</div>
+            <div class="dashboard-tab" data-tab="viewers">Visitantes</div>
         </div>
-      </nav>
-
-      <main class="panel">
-        <!-- DASHBOARD -->
-        <section id="dashboard" class="tab card">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-            <div>
-              <h3 style="margin-bottom:6px">Dashboard</h3>
-              <div class="muted">Resumen rápido</div>
+        
+        <div class="dashboard-content active" id="myPropertiesContent">
+            <h3>Mis Propiedades Publicadas</h3>
+            <div class="my-properties-grid" id="myPropertiesGrid">
+                <!-- Las propiedades del usuario se cargarán aquí -->
             </div>
-            <div style="text-align:right">
-              <div class="muted">Usuario:</div>
-              <div id="user-title" class="value-large">—</div>
+        </div>
+        
+        <div class="dashboard-content" id="statisticsContent">
+            <h3>Estadísticas de Mis Propiedades</h3>
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <h3>Propiedades Publicadas</h3>
+                    <div class="value" id="totalProperties">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total de Visitas</h3>
+                    <div class="value" id="totalViews">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Visitas Hoy</h3>
+                    <div class="value" id="todayViews">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Interesados</h3>
+                    <div class="value" id="interestedUsers">0</div>
+                </div>
             </div>
-          </div>
-
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:14px">
-            <div class="card" style="padding:12px">
-              <div class="muted">Horas este mes</div>
-              <div id="horas-mes" class="value-large">0</div>
-            </div>
-            <div class="card" style="padding:12px">
-              <div class="muted">Días trabajados</div>
-              <div id="dias-trabajados" class="value-large">0</div>
-            </div>
-            <div class="card" style="padding:12px">
-              <div class="muted">Guardias completadas</div>
-              <div id="guardias-completadas" class="value-large">0</div>
-            </div>
-            <div class="card" style="padding:12px">
-              <div class="muted">Promedio horas/día</div>
-              <div id="promedio-horas" class="value-large">0</div>
-            </div>
-          </div>
-
-          <div class="card" style="margin-top:12px">
-            <canvas id="horasChart" height="90"></canvas>
-          </div>
-        </section>
-
-        <!-- INGRESO -->
-        <section id="ingreso" class="tab card" style="display:none">
-          <h3>Registrar ingreso</h3>
-          <form id="ingreso-form">
-            <label>Legajo</label>
-            <input id="legajo" readonly />
-            <label>Actividad</label>
-            <select id="actividad" required aria-label="Actividad"></select>
-            <label>Observaciones</label>
-            <textarea id="observaciones-ingreso" rows="3"></textarea>
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <button class="btn" type="submit"><i class="fas fa-sign-in-alt"></i>&nbsp;Registrar</button>
-              <button id="clear-ingreso" type="button" class="btn ghost small">Limpiar</button>
-            </div>
-          </form>
-        </section>
-
-        <!-- SALIDA -->
-        <section id="salida" class="tab card" style="display:none">
-          <h3>Registrar salida</h3>
-          <form id="salida-form">
-            <label>Legajo</label>
-            <input id="legajo-salida" readonly />
-            <div class="row">
-              <div class="col">
-                <label>Móvil asignado</label>
-                <input id="movil-asignado" required />
-              </div>
-              <div class="col">
-                <label>Estado del móvil</label>
-                <select id="estado-movil" required>
-                  <option value="">Seleccione</option>
-                  <option>Disponible</option>
-                  <option>En servicio</option>
-                  <option>En mantenimiento</option>
-                </select>
-              </div>
-            </div>
-            <label>Observaciones</label>
-            <textarea id="observaciones" rows="3"></textarea>
-
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <button class="btn" type="submit"><i class="fas fa-sign-out-alt"></i>&nbsp;Registrar salida</button>
-              <button id="clear-salida" type="button" class="btn ghost small">Limpiar</button>
-            </div>
-          </form>
-        </section>
-
-        <!-- HISTORIAL PERSONAL -->
-        <section id="historial" class="tab card" style="display:none">
-          <h3>Historial</h3>
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-            <input type="month" id="filtro-fecha-historial" style="max-width:190px" />
-            <div style="flex:1"></div>
-            <div id="estado-actual" class="badge info">Sin guardia activa</div>
-          </div>
-
-          <table>
-            <thead><tr><th>Fecha</th><th>Actividad</th><th>Ingreso</th><th>Salida</th><th>Horas</th><th>Estado</th></tr></thead>
-            <tbody id="historial-table-body"></tbody>
-          </table>
-        </section>
-
-        <!-- NOVEDADES -->
-        <section id="novedades" class="tab card" style="display:none">
-          <h3>Novedades</h3>
-          <p class="muted" style="margin-bottom:16px">Información importante y anuncios recientes</p>
-          <div id="novedades-container"></div>
-        </section>
-
-        <!-- ADMIN: DASHBOARD -->
-        <section id="admin-dashboard" class="tab card" style="display:none">
-          <h3>Panel de Control - Administración</h3>
-          <div style="display:flex;gap:12px;margin-top:10px">
-            <div class="card" style="padding:12px">
-              <div class="muted">Total usuarios</div>
-              <div id="total-usuarios" class="value-large">0</div>
-            </div>
-            <div class="card" style="padding:12px">
-              <div class="muted">Registros totales</div>
-              <div id="total-registros" class="value-large">0</div>
-            </div>
-            <div class="card" style="padding:12px">
-              <div class="muted">Actividades</div>
-              <div id="total-actividades" class="value-large">0</div>
-            </div>
-            <div class="card" style="padding:12px">
-              <div class="muted">Novedades</div>
-              <div id="total-novedades" class="value-large">0</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ADMIN: USUARIOS -->
-        <section id="admin-users" class="tab card" style="display:none">
-          <h3>Gestión de Usuarios</h3>
-
-          <form id="add-user-form" style="max-width:520px">
-            <div class="row">
-              <div class="col">
-                <label>Nombre</label>
-                <input id="new-user-name" required />
-              </div>
-              <div class="col">
-                <label>Usuario</label>
-                <input id="new-user-username" required />
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label>Contraseña</label>
-                <input id="new-user-pass" type="password" required />
-              </div>
-              <div class="col">
-                <label>Rango</label>
-                <select id="new-user-rango" required>
-                  <option value="">Seleccionar</option>
-                  <option>Bombero</option>
-                  <option>Cabo</option>
-                  <option>Teniente</option>
-                  <option>Capitán</option>
-                </select>
-              </div>
-            </div>
-
-            <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-              <button class="btn" type="submit"><i class="fas fa-user-plus"></i>&nbsp;Agregar</button>
-              <button id="toggle-pass" type="button" class="btn ghost small">Mostrar contraseña</button>
-              <div style="flex:1"></div>
-              <input id="search-users" placeholder="Buscar usuarios..." style="max-width:220px;padding:8px;border-radius:8px;border:1px solid #eef2ff" />
-            </div>
-          </form>
-
-          <div style="margin-top:12px">
-            <table>
-              <thead><tr><th>Nombre</th><th>Usuario</th><th>Rango</th><th>Acción</th></tr></thead>
-              <tbody id="users-table-body"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- ADMIN: ACTIVIDADES -->
-        <section id="admin-actividades" class="tab card" style="display:none">
-          <h3>Gestión de Actividades</h3>
-
-          <form id="add-actividad-form" style="max-width:520px">
-            <div style="display:flex;gap:8px">
-              <input id="new-actividad" placeholder="Nombre de la actividad" required />
-              <button class="btn" type="submit"><i class="fas fa-plus"></i>&nbsp;Agregar</button>
-            </div>
-          </form>
-
-          <div style="margin-top:12px">
-            <table style="max-width:500px">
-              <thead><tr><th>Actividad</th><th>Acción</th></tr></thead>
-              <tbody id="actividades-table-body"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- ADMIN: NOVEDADES -->
-        <section id="admin-novedades" class="tab card" style="display:none">
-          <h3>Gestión de Novedades</h3>
-          <p class="muted" style="margin-bottom:16px">Crear y gestionar novedades para todos los usuarios</p>
-
-          <form id="add-novedad-form" style="max-width:600px; margin-bottom: 20px;">
-            <label>Título de la novedad</label>
-            <input id="novedad-titulo" required placeholder="Ingrese el título de la novedad" />
             
-            <label>Contenido</label>
-            <textarea id="novedad-contenido" rows="4" required placeholder="Escriba el contenido de la novedad"></textarea>
-            
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <button class="btn" type="submit"><i class="fas fa-plus"></i>&nbsp;Publicar Novedad</button>
-              <button type="button" class="btn ghost small" onclick="document.getElementById('add-novedad-form').reset()">Limpiar</button>
+            <div class="chart-container">
+                <canvas id="viewsChart"></canvas>
             </div>
-          </form>
+        </div>
+        
+        <div class="dashboard-content" id="viewersContent">
+            <h3>Personas que visitaron mis propiedades</h3>
+            <div class="viewers-list" id="viewersList">
+                <!-- Los visitantes se cargarán aquí -->
+            </div>
+        </div>
+    </section>
 
-          <h4 style="margin-top: 20px; margin-bottom: 12px;">Novedades publicadas</h4>
-          <div id="admin-novedades-container"></div>
-        </section>
+    <!-- Profile Section -->
+    <section class="profile container" id="profile">
+        <div class="profile-header" id="profileHeader">
+            <!-- El contenido del perfil se cargará dinámicamente -->
+        </div>
+        
+        <div class="section-title">
+            <h2 id="profilePropertiesTitle">Propiedades</h2>
+            <p id="profilePropertiesSubtitle">Todas las propiedades publicadas por este usuario</p>
+        </div>
+        
+        <div class="properties-grid" id="profilePropertiesGrid">
+            <!-- Las propiedades del perfil se cargarán aquí -->
+        </div>
+    </section>
 
-      </main>
+    <!-- Properties Section -->
+    <section class="container" id="propiedades">
+        <div class="section-title">
+            <h2 id="propertiesTitle">Propiedades Disponibles</h2>
+            <p id="propertiesSubtitle">Explora todas nuestras propiedades en venta y alquiler</p>
+        </div>
+        
+        <div class="properties-grid" id="propertiesGrid">
+            <!-- Las propiedades se cargarán aquí dinámicamente -->
+        </div>
+    </section>
+
+    <!-- Login/Register Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2 class="modal-title">Bienvenido a TUCASA</h2>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Iniciar Sesión</div>
+                <div class="auth-tab" data-tab="register">Registrarse</div>
+            </div>
+            
+            <!-- Login Form -->
+            <div class="auth-form active" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Correo electrónico</label>
+                    <input type="email" id="loginEmail" placeholder="tu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary btn-full" id="loginSubmit">Iniciar Sesión</button>
+                
+                <div class="social-login">
+                    <button class="social-btn" id="googleLogin">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2LjUxIDkuMjA0NTVDMTYuNTEgOC41NjYzNiAxNi40NDkgNy45NTQ1NSAxNi4zMTYgNy4zNjM2NEg5LjIyVjEwLjg0NTVIMTMuMzg0QzEzLjE4IDExLjk4IDEyLjQ5IDEyLjkyMjcgMTEuNDE4IDEzLjU2MzZWMTAuODQ1NUgxNC45NjRMMDYuNTEgOS4yMDQ1NVoiIGZpbGw9IiM0Mjg1RjQiLz4KPHBhdGggZD0iTTkuMjIgMTguMDA0NUMxMS44MiAxOC4wMDQ1IDEzLjk2IDE3LjE3MjcgMTUuNTk2IDE1LjU2MzZMMTMuNDE4IDEzLjgxODJDMTIuNTIgMTQuNTAxOCAxMS4zMiAxNC45MDkxIDkuMjIgMTQuOTA5MUM2LjU0IDE0LjkwOTEgNC4yNiAxMy4wOTA5IDMuNDYgMTAuNTQ1NUgwLjE2VDEyLjMwMThMOS4yMiAxOC4wMDQ1WiIgZmlsbD0iIzM0QTg1MyIvPgo8cGF0aCBkPSJNMy40NiAxMC41NDU1QzMuMDYgOS4zNjM2NCAzLjA2IDguMDgxODIgMy40NiA2LjkwMDAxVjMuNTQ1NDVIMC4xNkMtMS4wMiA2LjAwMDAxIC0xLjAyIDkuNDU0NTUgMC4xNiAxMi4wMDAxTDMuNDYgMTAuNTQ1NVoiIGZpbGw9IiNGQkJCMDAiLz4KPHBhdGggZD0iTTkuMjIgMy42MzYzNkMxMS4wOCAzLjYzNjM2IDEyLjY2IDQuMzQ1NDUgMTMuNzIgNS41NDU0NUwxNS42NiAzLjYwOTA5QzEzLjk2IDEuOTkwOTEgMTEuODIgMS4wMDAwMSA5LjIyIDEuMDAwMDFDNS40MiAxLjAwMDAxIDIuMDIgMy42MzYzNiAwLjE2IDcuMzYzNjRMMy40NiA4LjgxODJDNC4yNiA2LjI3MjczIDYuNTQgNC40NTQ1NSA5LjIyIDQuNDU0NTVWMy42MzYzNloiIGZpbGw9IiNFQTQzMzUiLz4KPC9zdmc+Cg==" alt="Google">
+                        Continuar con Google
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Register Form -->
+            <div class="auth-form" id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Nombre completo</label>
+                    <input type="text" id="registerName" placeholder="Tu nombre completo">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Correo electrónico</label>
+                    <input type="email" id="registerEmail" placeholder="tu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Teléfono</label>
+                    <input type="tel" id="registerPhone" placeholder="+1 234 567 8900">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Contraseña</label>
+                    <input type="password" id="registerPassword" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Confirmar contraseña</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary btn-full" id="registerSubmit">Registrarse</button>
+                
+                <div class="social-login">
+                    <button class="social-btn" id="googleRegister">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2LjUxIDkuMjA0NTVDMTYuNTEgOC41NjYzNiAxNi40NDkgNy45NTQ1NSAxNi4zMTYgNy4zNjM2NEg5LjIyVjEwLjg0NTVIMTMuMzg0QzEzLjE4IDExLjk4IDEyLjQ5IDEyLjkyMjcgMTEuNDE4IDEzLjU2MzZWMTAuODQ1NUgxNC45NjRMMDYuNTEgOS4yMDQ1NVoiIGZpbGw9IiM0Mjg1RjQiLz4KPHBhdGggZD0iTTkuMjIgMTguMDA0NUMxMS44MiAxOC4wMDQ1IDEzLjk2IDE3LjE3MjcgMTUuNTk2IDE1LjU2MzZMMTMuNDE4IDEzLjgxODJDMTIuNTIgMTQuNTAxOCAxMS4zMiAxNC45MDkxIDkuMjIgMTQuOTA5MUM2LjU0IDE0LjkwOTEgNC4yNiAxMy4wOTA5IDMuNDYgMTAuNTQ1NUgwLjE2VDEyLjMwMThMOS4yMiAxOC4wMDQ1WiIgZmlsbD0iIzM0QTg1MyIvPgo8cGF0aCBkPSJNMy40NiAxMC41NDU1QzMuMDYgOS4zNjM2NCAzLjA2IDguMDgxODIgMy40NiA2LjkwMDAxVjMuNTQ1NDVIMC4xNkMtMS4wMiA2LjAwMDAxIC0xLjAyIDkuNDU0NTUgMC4xNiAxMi4wMDAxTDMuNDYgMTAuNTQ1NVoiIGZpbGw9IiNGQkJCMDAiLz4KPHBhdGggZD0iTTkuMjIgMy42MzYzNkMxMS4wOCAzLjYzNjM2IDEyLjY2IDQuMzQ1NDUgMTMuNzIgNS41NDU0NUwxNS42NiAzLjYwOTA5QzEzLjk2IDEuOTkwOTEgMTEuODIgMS4wMDAwMSA5LjIyIDEuMDAwMDFDNS40MiAxLjAwMDAxIDIuMDIgMy42MzYzNiAwLjE2IDcuMzYzNjRMMy40NiA4LjgxODJDNC4yNiA2LjI3MjczIDYuNTQgNC40NTQ1NSA5LjIyIDQuNDU0NTVWMy42MzYzNloiIGZpbGw9IiNFQTQzMzUiLz4KPC9zdmc+Cg==" alt="Google">
+                        Registrarse con Google
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="popup-container"></div>
+    <!-- Add/Edit Property Modal -->
+    <div class="modal" id="propertyModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closePropertyModal">&times;</span>
+            <h2 class="modal-title" id="propertyModalTitle">Agregar Nueva Propiedad</h2>
+            
+            <form id="propertyForm">
+                <div class="form-group">
+                    <label for="propertyTitle">Título</label>
+                    <input type="text" id="propertyTitle" placeholder="Ej: Hermosa casa familiar con jardín">
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyType">Tipo de Propiedad</label>
+                    <select id="propertyType">
+                        <option value="casa">Casa</option>
+                        <option value="apartamento">Apartamento</option>
+                        <option value="terreno">Terreno</option>
+                        <option value="oficina">Oficina</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyOperation">Operación</label>
+                    <select id="propertyOperation">
+                        <option value="venta">Venta</option>
+                        <option value="alquiler">Alquiler</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyPrice">Precio</label>
+                    <input type="number" id="propertyPrice" placeholder="Ej: 150000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyAddress">Dirección</label>
+                    <input type="text" id="propertyAddress" placeholder="Ej: Av. Principal 123, Ciudad">
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyBedrooms">Habitaciones</label>
+                    <input type="number" id="propertyBedrooms" placeholder="Ej: 3">
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyBathrooms">Baños</label>
+                    <input type="number" id="propertyBathrooms" placeholder="Ej: 2">
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyArea">Área (m²)</label>
+                    <input type="number" id="propertyArea" placeholder="Ej: 120">
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyDescription">Descripción</label>
+                    <textarea id="propertyDescription" rows="4" placeholder="Describe tu propiedad..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyImage">URL de la imagen</label>
+                    <input type="text" id="propertyImage" placeholder="https://ejemplo.com/imagen.jpg">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full" id="savePropertyBtn">Guardar Propiedad</button>
+            </form>
+        </div>
+    </div>
 
-  </div>
+    <!-- Chat System -->
+    <div class="chat-toggle" id="chatToggle">
+        <span>💬</span>
+    </div>
+    
+    <div class="chat-list" id="chatList">
+        <div class="chat-list-header">Conversaciones</div>
+        <!-- Las conversaciones se cargarán aquí dinámicamente -->
+    </div>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <h3 id="chatWithUser">Chat</h3>
+            <button class="chat-close" id="chatClose">×</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Los mensajes se cargarán aquí dinámicamente -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Escribe un mensaje...">
+            <button id="chatSend">➤</button>
+        </div>
+    </div>
 
-<script>
-/* ===========================
-   Datos iniciales y utilidades
-   =========================== */
-const STORAGE = {
-  USERS: 'usuariosBomberos_v2',
-  REGS: 'registrosBomberos_v2',
-  ACTS: 'actividadesBomberos_v2',
-  SESSION: 'sesionBomberos_v2',
-  NOVEDADES: 'novedadesBomberos_v2'
-};
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>TUCASA</h3>
+                    <p>Encuentra la propiedad de tus sueños con nosotros. Miles de opciones en venta y alquiler.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Enlaces Rápidos</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" id="footerInicioLink">Inicio</a></li>
+                        <li><a href="#" id="footerPropiedadesLink">Propiedades</a></li>
+                        <li><a href="#" id="footerVenderLink">Vender</a></li>
+                        <li><a href="#" id="footerProfileLink">Perfil</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contacto</h3>
+                    <ul class="footer-links">
+                        <li>Email: info@tucasa.com</li>
+                        <li>Teléfono: +1 234 567 890</li>
+                        <li>Dirección: Calle Principal 123</li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Síguenos</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">LinkedIn</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 TUCASA. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
 
-let usuarios = JSON.parse(localStorage.getItem(STORAGE.USERS)) || [
-  // usuario admin por defecto para pruebas (cambiar después)
-  { id: 1, legajo: 'ADMIN', nombre: 'Administrador', rango: 'Admin', usuario: 'admin', password: 'admin', admin: true }
-];
-
-let registros = JSON.parse(localStorage.getItem(STORAGE.REGS)) || [];
-let actividades = JSON.parse(localStorage.getItem(STORAGE.ACTS)) || [
-  { id: 1, nombre: 'Patrulla' },
-  { id: 2, nombre: 'Guardia' },
-  { id: 3, nombre: 'Entrenamiento' },
-  { id: 4, nombre: 'Mantenimiento' }
-];
-
-let novedades = JSON.parse(localStorage.getItem(STORAGE.NOVEDADES)) || [
-  { id: 1, titulo: 'Bienvenidos al Sistema', contenido: 'Este es el sistema de control de guardias para el cuerpo de bomberos. Por favor, registren sus ingresos y salidas correctamente.', fecha: new Date().toISOString().split('T')[0], autor: 'Administrador' }
-];
-
-let usuarioActual = null;
-let horasChart = null;
-
-/* Guardar datos */
-function guardarDatos(){
-  localStorage.setItem(STORAGE.USERS, JSON.stringify(usuarios));
-  localStorage.setItem(STORAGE.REGS, JSON.stringify(registros));
-  localStorage.setItem(STORAGE.ACTS, JSON.stringify(actividades));
-  localStorage.setItem(STORAGE.NOVEDADES, JSON.stringify(novedades));
-}
-
-/* Popup simple */
-function mostrarPopup(txt, type='info'){
-  const el = document.createElement('div');
-  el.className = 'popup';
-  el.textContent = txt;
-  if(type==='error') el.style.background = '#ef4444';
-  if(type==='success') el.style.background = '#10b981';
-  document.getElementById('popup-container').appendChild(el);
-  setTimeout(()=> el.remove(), 2500);
-}
-
-/* ===========================
-   Inicialización DOM
-   =========================== */
-document.addEventListener('DOMContentLoaded', () => {
-  // restaurar sesión
-  const s = localStorage.getItem(STORAGE.SESSION);
-  if(s){
-    try{
-      usuarioActual = JSON.parse(s);
-      abrirAppSegunRol();
-    }catch(e){ console.warn('sesion no valida') }
-  }
-
-  // eventos login
-  document.getElementById('login-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const u = document.getElementById('login-user').value.trim();
-    const p = document.getElementById('login-password').value;
-    const found = usuarios.find(x => x.usuario === u && x.password === p);
-    if(found){
-      usuarioActual = found;
-      localStorage.setItem(STORAGE.SESSION, JSON.stringify(found));
-      abrirAppSegunRol();
-      mostrarPopup('Bienvenido ' + found.nombre, 'success');
-    } else {
-      document.getElementById('login-error').style.display='block';
-      document.getElementById('login-error').textContent = 'Usuario o contraseña incorrectos';
-      setTimeout(()=> document.getElementById('login-error').style.display='none', 3000);
-    }
-  });
-
-  // demo quick login (crea un usuario demo si no existe)
-  document.getElementById('demo-user').addEventListener('click', () => {
-    let demo = usuarios.find(u=> u.usuario==='demo');
-    if(!demo){
-      const id = usuarios.length ? Math.max(...usuarios.map(x=>x.id)) + 1 : 2;
-      demo = { id, legajo:`B${id.toString().padStart(3,'0')}`, nombre:'Usuario Demo', rango:'Bombero', usuario:'demo', password:'demo', admin:false};
-      usuarios.push(demo);
-      guardarDatos();
-    }
-    document.getElementById('login-user').value = 'demo';
-    document.getElementById('login-password').value = 'demo';
-    document.getElementById('login-form').dispatchEvent(new Event('submit'));
-  });
-
-  // export CSV
-  document.getElementById('btn-export').addEventListener('click', exportarCSV);
-
-  // logout top
-  document.getElementById('logout-top').addEventListener('click', () => {
-    localStorage.removeItem(STORAGE.SESSION);
-    location.reload();
-  });
-
-  // navigation links
-  document.querySelectorAll('.nav-link').forEach(link=>{
-    link.addEventListener('click', e=>{
-      e.preventDefault();
-      // ocultar todas las tabs
-      document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
-      // remover active en nav
-      document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-      link.classList.add('active');
-      const id = link.getAttribute('href').slice(1);
-      const el = document.getElementById(id);
-      if(el) el.style.display = 'block';
-
-      // acciones on open
-      if(id === 'historial') cargarHistorial();
-      if(id === 'dashboard') actualizarDashboard();
-      if(id === 'admin-users') cargarUsuarios();
-      if(id === 'admin-actividades') cargarActividadesAdmin();
-      if(id === 'admin-dashboard') actualizarAdminDashboard();
-      if(id === 'novedades') {
-        cargarNovedades();
-        // Resetear notificaciones cuando el usuario visita la sección de novedades
-        if (!usuarioActual.admin) {
-          document.getElementById('novedades-badge').style.display = 'none';
+    <script>
+        // ============================
+        // INICIALIZACIÓN DE DATOS
+        // ============================
+        
+        // Cargar datos del localStorage o inicializar con datos de ejemplo
+        let users = JSON.parse(localStorage.getItem('tucasa_users')) || [];
+        let properties = JSON.parse(localStorage.getItem('tucasa_properties')) || [];
+        let propertyViews = JSON.parse(localStorage.getItem('tucasa_property_views')) || {};
+        let currentUser = JSON.parse(localStorage.getItem('tucasa_current_user')) || null;
+        let conversations = JSON.parse(localStorage.getItem('tucasa_conversations')) || {};
+        
+        // Datos de ejemplo si no hay datos en localStorage
+        if (users.length === 0) {
+            users = [
+                {
+                    id: 'user_1',
+                    name: 'María González',
+                    email: 'maria@example.com',
+                    phone: '+1 234 567 890',
+                    password: 'password123',
+                    registrationDate: new Date().toISOString(),
+                    bio: 'Especialista en propiedades residenciales con más de 10 años de experiencia. Me encanta ayudar a las familias a encontrar su hogar ideal.',
+                    company: 'Inmobiliaria TUCASA'
+                },
+                {
+                    id: 'user_2',
+                    name: 'Carlos Rodríguez',
+                    email: 'carlos@example.com',
+                    phone: '+1 345 678 901',
+                    password: 'password123',
+                    registrationDate: new Date().toISOString(),
+                    bio: 'Inversor inmobiliario especializado en propiedades comerciales. Siempre buscando nuevas oportunidades.',
+                    company: 'Rodríguez Inversiones'
+                }
+            ];
+            localStorage.setItem('tucasa_users', JSON.stringify(users));
         }
-      }
-      if(id === 'admin-novedades') cargarNovedadesAdmin();
-    });
-  });
-
-  // forms
-  document.getElementById('ingreso-form').addEventListener('submit', registrarIngreso);
-  document.getElementById('salida-form').addEventListener('submit', registrarSalida);
-  document.getElementById('add-user-form').addEventListener('submit', agregarUsuario);
-  document.getElementById('add-actividad-form').addEventListener('submit', agregarActividad);
-  document.getElementById('add-novedad-form').addEventListener('submit', agregarNovedad);
-
-  // otros controles
-  document.getElementById('filtro-fecha-historial').addEventListener('change', cargarHistorial);
-  document.getElementById('clear-ingreso').addEventListener('click', ()=> document.getElementById('ingreso-form').reset());
-  document.getElementById('clear-salida').addEventListener('click', ()=> document.getElementById('salida-form').reset());
-  document.getElementById('toggle-pass').addEventListener('click', toggleMostrarPass);
-  document.getElementById('search-users').addEventListener('input', cargarUsuarios);
-
-  // inicializar selects/actividades
-  cargarActividades();
-});
-
-/* ===========================
-   Abrir app segun rol
-   =========================== */
-function abrirAppSegunRol(){
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'grid';
-  document.getElementById('user-title').textContent = usuarioActual.nombre + ' · ' + usuarioActual.rango;
-  document.getElementById('session-info').textContent = usuarioActual.nombre;
-
-  // rellenar datos de legajo
-  document.getElementById('legajo').value = usuarioActual.legajo || '';
-  document.getElementById('legajo-salida').value = usuarioActual.legajo || '';
-
-  // mostrar/ocultar opciones según rol
-  document.querySelectorAll('.admin-only').forEach(el=>{
-    el.style.display = usuarioActual.admin ? 'block' : 'none';
-  });
-  
-  document.querySelectorAll('.user-only').forEach(el=>{
-    el.style.display = usuarioActual.admin ? 'none' : 'block';
-  });
-
-  // por defecto abrir dashboard
-  document.querySelectorAll('.tab').forEach(t=> t.style.display='none');
-  
-  if (usuarioActual.admin) {
-    document.getElementById('admin-dashboard').style.display = 'block';
-    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-    document.querySelector('a[href="#admin-dashboard"]').classList.add('active');
-  } else {
-    document.getElementById('dashboard').style.display = 'block';
-    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-    document.querySelector('a[href="#dashboard"]').classList.add('active');
-  }
-
-  actualizarDashboard();
-  cargarActividades();
-  actualizarAdminDashboard();
-  
-  // Actualizar notificación de novedades para usuarios regulares
-  if (!usuarioActual.admin) {
-    actualizarNotificacionNovedades();
-  }
-}
-
-/* ===========================
-   Actividades
-   =========================== */
-function cargarActividades(){
-  const sel = document.getElementById('actividad');
-  sel.innerHTML = '<option value="">Selecciona actividad</option>';
-  actividades.forEach(a=>{
-    const opt = document.createElement('option');
-    opt.value = a.id;
-    opt.textContent = a.nombre;
-    sel.appendChild(opt);
-  });
-}
-
-function agregarActividad(e){
-  e.preventDefault();
-  const nombre = document.getElementById('new-actividad').value.trim();
-  if(!nombre){ mostrarPopup('Ingrese nombre de actividad','error'); return; }
-  if(actividades.some(a => a.nombre.toLowerCase() === nombre.toLowerCase())){
-    mostrarPopup('Actividad ya existente','error'); return;
-  }
-  const id = actividades.length ? Math.max(...actividades.map(a=>a.id)) + 1 : 1;
-  actividades.push({id, nombre});
-  guardarDatos();
-  mostrarPopup('Actividad agregada','success');
-  document.getElementById('add-actividad-form').reset();
-  cargarActividadesAdmin();
-  cargarActividades();
-}
-
-function cargarActividadesAdmin(){
-  const tbody = document.getElementById('actividades-table-body');
-  tbody.innerHTML = '';
-  actividades.forEach(a=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${a.nombre}</td>
-      <td><button class="btn ghost small" onclick="confirmEliminarActividad(${a.id})"><i class="fas fa-trash"></i>&nbsp;Eliminar</button></td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function confirmEliminarActividad(id){
-  if(actividades.length <= 1){ mostrarPopup('Debe quedar al menos una actividad','error'); return; }
-  if(confirm('Eliminar actividad?')) eliminarActividad(id);
-}
-
-function eliminarActividad(id){
-  actividades = actividades.filter(a => a.id !== id);
-  guardarDatos();
-  cargarActividadesAdmin();
-  cargarActividades();
-  mostrarPopup('Actividad eliminada','success');
-}
-
-/* ===========================
-   Usuarios (admin)
-   =========================== */
-function toggleMostrarPass(){
-  const p = document.getElementById('new-user-pass');
-  const btn = document.getElementById('toggle-pass');
-  if(p.type === 'password'){ p.type = 'text'; btn.textContent = 'Ocultar contraseña'; }
-  else { p.type = 'password'; btn.textContent = 'Mostrar contraseña'; }
-}
-
-function agregarUsuario(e){
-  e.preventDefault();
-  const nombre = document.getElementById('new-user-name').value.trim();
-  const usuario = document.getElementById('new-user-username').value.trim();
-  const password = document.getElementById('new-user-pass').value;
-  const rango = document.getElementById('new-user-rango').value;
-
-  if(!nombre || !usuario || !password || !rango){ mostrarPopup('Complete todos los campos','error'); return; }
-  if(usuarios.some(u => u.usuario === usuario)){ mostrarPopup('Usuario ya existe','error'); return; }
-
-  const id = usuarios.length ? Math.max(...usuarios.map(u=>u.id)) + 1 : 2;
-  const legajo = `B${id.toString().padStart(3,'0')}`;
-  usuarios.push({ id, legajo, nombre, rango, usuario, password, admin:false });
-  guardarDatos();
-  mostrarPopup('Usuario agregado','success');
-  document.getElementById('add-user-form').reset();
-  cargarUsuarios();
-  actualizarAdminDashboard();
-}
-
-function cargarUsuarios(){
-  const term = document.getElementById('search-users').value?.toLowerCase() || '';
-  const tbody = document.getElementById('users-table-body');
-  tbody.innerHTML = '';
-  const usuariosNormales = usuarios.filter(u=> !u.admin && 
-    (u.nombre.toLowerCase().includes(term) || u.usuario.toLowerCase().includes(term) || u.rango.toLowerCase().includes(term)));
-  if(usuariosNormales.length === 0){
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted)">Sin usuarios</td></tr>';
-    return;
-  }
-  usuariosNormales.forEach(u=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${u.nombre}</td><td>${u.usuario}</td><td>${u.rango}</td>
-      <td>
-        <button class="btn ghost small" onclick="resetClave(${u.id})"><i class="fas fa-key"></i>&nbsp;Reset</button>
-        <button class="btn ghost small" onclick="confirmEliminarUsuario(${u.id})" style="margin-left:6px"><i class="fas fa-trash"></i>&nbsp;Eliminar</button>
-      </td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function resetClave(id){
-  if(!confirm('Resetear contraseña a "demo"?')) return;
-  const u = usuarios.find(x=>x.id===id);
-  if(u){ u.password = 'demo'; guardarDatos(); mostrarPopup('Contraseña reseteada a "demo"','success'); }
-}
-
-function confirmEliminarUsuario(id){
-  if(confirm('¿Eliminar usuario? Esta acción es irreversible.')){
-    usuarios = usuarios.filter(u => u.id !== id);
-    guardarDatos();
-    cargarUsuarios();
-    actualizarAdminDashboard();
-    mostrarPopup('Usuario eliminado','success');
-  }
-}
-
-/* ===========================
-   Ingresos / Salidas (usuario)
-   =========================== */
-function registrarIngreso(e){
-  e.preventDefault();
-  const actividadId = document.getElementById('actividad').value;
-  const observaciones = document.getElementById('observaciones-ingreso').value.trim();
-
-  if(!actividadId){ mostrarPopup('Selecciona una actividad','error'); return; }
-
-  // Verificar ingreso pendiente
-  const pendiente = registros.some(r => r.legajo === usuarioActual.legajo && !r.salida);
-  if(pendiente){ mostrarPopup('Tienes ingreso pendiente','error'); return; }
-
-  const fecha = new Date();
-  const actividad = actividades.find(a => a.id == actividadId);
-  registros.push({
-    legajo: usuarioActual.legajo,
-    actividad: actividad ? actividad.nombre : '—',
-    ingreso: fecha.toLocaleTimeString(),
-    salida: '',
-    horas: 0,
-    observaciones: observaciones,
-    fecha: fecha.toISOString().split('T')[0],
-    timestampIngreso: fecha.getTime()
-  });
-  guardarDatos();
-  mostrarPopup('Ingreso registrado','success');
-  document.getElementById('ingreso-form').reset();
-  document.getElementById('legajo').value = usuarioActual.legajo;
-  actualizarDashboard();
-}
-
-function registrarSalida(e){
-  e.preventDefault();
-  const movil = document.getElementById('movil-asignado').value.trim();
-  const estado = document.getElementById('estado-movil').value;
-  const observ = document.getElementById('observaciones').value.trim();
-
-  if(!movil || !estado){ mostrarPopup('Complete los campos','error'); return; }
-
-  const registro = registros.find(r => r.legajo === usuarioActual.legajo && !r.salida);
-  if(!registro){ mostrarPopup('No hay ingreso pendiente','error'); return; }
-
-  const fechaSalida = new Date();
-  const fechaIngreso = new Date(registro.timestampIngreso || Date.now());
-  const diffMs = fechaSalida - fechaIngreso;
-  const horas = parseFloat((diffMs / (1000*60*60)).toFixed(2));
-
-  registro.salida = fechaSalida.toLocaleTimeString();
-  registro.horas = horas || 0;
-  registro.movil = movil;
-  registro.estadoMovil = estado;
-  registro.observacionesSalida = observ;
-
-  guardarDatos();
-  mostrarPopup('Salida registrada','success');
-  document.getElementById('salida-form').reset();
-  document.getElementById('legajo-salida').value = usuarioActual.legajo;
-  actualizarDashboard();
-  cargarHistorial();
-}
-
-/* ===========================
-   Historial y dashboard
-   =========================== */
-function cargarHistorial(){
-  const tbody = document.getElementById('historial-table-body');
-  tbody.innerHTML = '';
-
-  let datos = registros.filter(r => r.legajo === usuarioActual.legajo);
-  const filtro = document.getElementById('filtro-fecha-historial').value;
-  if(filtro){
-    datos = datos.filter(r => r.fecha.startsWith(filtro));
-  }
-
-  if(datos.length === 0){
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No hay registros</td></tr>';
-    return;
-  }
-
-  datos.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-  datos.forEach(r=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${r.fecha}</td>
-      <td>${r.actividad}</td>
-      <td>${r.ingreso}</td>
-      <td>${r.salida || '-'}</td>
-      <td>${r.horas || '-'}</td>
-      <td>${r.salida ? '<span class="badge success">Completo</span>' : '<span class="badge warn">Pendiente</span>'}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function actualizarDashboard(){
-  // seguridad: si no hay usuario actual no hacer nada
-  if(!usuarioActual) return;
-
-  const registrosUsuario = registros.filter(r => r.legajo === usuarioActual.legajo);
-  const registrosCompletos = registrosUsuario.filter(r => r.salida);
-
-  // horas mes actual
-  const hoy = new Date();
-  const mes = hoy.getMonth();
-  const anio = hoy.getFullYear();
-  const horasMes = registrosCompletos
-    .filter(r => {
-      const fr = new Date(r.fecha);
-      return fr.getMonth() === mes && fr.getFullYear() === anio;
-    })
-    .reduce((s,r) => s + (parseFloat(r.horas) || 0), 0);
-
-  const diasTrabajados = new Set(registrosCompletos.map(r => r.fecha)).size;
-  const promedio = diasTrabajados ? (horasMes / diasTrabajados).toFixed(2) : 0;
-
-  document.getElementById('horas-mes').textContent = horasMes.toFixed(2);
-  document.getElementById('dias-trabajados').textContent = diasTrabajados;
-  document.getElementById('guardias-completadas').textContent = registrosCompletos.length;
-  document.getElementById('promedio-horas').textContent = promedio;
-
-  const ultima = registrosUsuario.find(r => !r.salida);
-  const estadoEl = document.getElementById('estado-actual');
-  if(ultima){
-    estadoEl.textContent = `Guardia activa — ${ultima.actividad} desde ${ultima.ingreso}`;
-    estadoEl.className = 'badge success';
-  } else {
-    estadoEl.textContent = 'Sin guardia activa';
-    estadoEl.className = 'badge info';
-  }
-
-  // Chart
-  initChart();
-}
-
-/* Chart: últimas 7 fechas (por día) */
-function initChart(){
-  const ctx = document.getElementById('horasChart').getContext('2d');
-  if(horasChart) horasChart.destroy();
-
-  const ult7 = [];
-  for(let i=6;i>=0;i--){
-    const d = new Date();
-    d.setDate(d.getDate()-i);
-    ult7.push(d.toISOString().split('T')[0]);
-  }
-
-  const data = ult7.map(fecha => {
-    return registros
-      .filter(r => r.fecha === fecha && r.legajo === usuarioActual.legajo && r.salida)
-      .reduce((s,r)=> s + (parseFloat(r.horas)||0), 0);
-  });
-
-  const labels = ult7.map(f=>{
-    const d = new Date(f); return `${d.getDate()}/${d.getMonth()+1}`;
-  });
-
-  horasChart = new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets: [{ label: 'Horas', data, backgroundColor: 'rgba(15,98,254,0.18)', borderColor: 'rgba(15,98,254,0.6)', borderWidth:1 }]},
-    options: {
-      responsive:true,
-      scales:{ y: { beginAtZero:true, title:{display:true,text:'Horas'}}, x:{ title:{display:true,text:'Día'} } },
-      plugins: { legend:{ display:false } }
-    }
-  });
-}
-
-/* ===========================
-   Novedades
-   =========================== */
-function cargarNovedades(){
-  const container = document.getElementById('novedades-container');
-  container.innerHTML = '';
-  
-  if(novedades.length === 0){
-    container.innerHTML = '<p class="muted" style="text-align:center;padding:20px">No hay novedades publicadas</p>';
-    return;
-  }
-  
-  // Ordenar novedades por fecha (más recientes primero)
-  const novedadesOrdenadas = [...novedades].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-  
-  novedadesOrdenadas.forEach(novedad => {
-    const card = document.createElement('div');
-    card.className = 'novedad-card';
-    
-    const fechaFormateada = new Date(novedad.fecha).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-    
-    card.innerHTML = `
-      <div class="novedad-header">
-        <div class="novedad-titulo">${novedad.titulo}</div>
-        <div class="novedad-fecha">${fechaFormateada}</div>
-      </div>
-      <div class="novedad-contenido">${novedad.contenido}</div>
-      <div style="margin-top:8px;font-size:12px;color:var(--muted)">Publicado por: ${novedad.autor}</div>
-    `;
-    
-    container.appendChild(card);
-  });
-}
-
-function cargarNovedadesAdmin(){
-  const container = document.getElementById('admin-novedades-container');
-  container.innerHTML = '';
-  
-  if(novedades.length === 0){
-    container.innerHTML = '<p class="muted" style="text-align:center;padding:20px">No hay novedades publicadas</p>';
-    return;
-  }
-  
-  // Ordenar novedades por fecha (más recientes primero)
-  const novedadesOrdenadas = [...novedades].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-  
-  novedadesOrdenadas.forEach(novedad => {
-    const card = document.createElement('div');
-    card.className = 'novedad-card';
-    
-    const fechaFormateada = new Date(novedad.fecha).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-    
-    card.innerHTML = `
-      <div class="novedad-header">
-        <div class="novedad-titulo">${novedad.titulo}</div>
-        <div class="novedad-fecha">${fechaFormateada}</div>
-      </div>
-      <div class="novedad-contenido">${novedad.contenido}</div>
-      <div style="margin-top:8px;font-size:12px;color:var(--muted)">Publicado por: ${novedad.autor}</div>
-      <button class="novedad-eliminar" onclick="eliminarNovedad(${novedad.id})" title="Eliminar novedad">
-        <i class="fas fa-trash"></i>
-      </button>
-    `;
-    
-    container.appendChild(card);
-  });
-}
-
-function agregarNovedad(e){
-  e.preventDefault();
-  const titulo = document.getElementById('novedad-titulo').value.trim();
-  const contenido = document.getElementById('novedad-contenido').value.trim();
-  
-  if(!titulo || !contenido){ 
-    mostrarPopup('Complete todos los campos','error'); 
-    return; 
-  }
-  
-  const id = novedades.length ? Math.max(...novedades.map(n=>n.id)) + 1 : 1;
-  const fecha = new Date().toISOString().split('T')[0];
-  
-  novedades.push({
-    id,
-    titulo,
-    contenido,
-    fecha,
-    autor: usuarioActual.nombre
-  });
-  
-  guardarDatos();
-  mostrarPopup('Novedad publicada correctamente','success');
-  document.getElementById('add-novedad-form').reset();
-  cargarNovedadesAdmin();
-  
-  // Actualizar notificación para usuarios
-  actualizarNotificacionNovedades();
-  
-  // Si estamos en la sección de novedades, actualizarla también
-  if(document.getElementById('novedades').style.display === 'block') {
-    cargarNovedades();
-  }
-}
-
-function eliminarNovedad(id){
-  if(!confirm('¿Está seguro de que desea eliminar esta novedad?')) return;
-  
-  novedades = novedades.filter(n => n.id !== id);
-  guardarDatos();
-  mostrarPopup('Novedad eliminada','success');
-  cargarNovedadesAdmin();
-  
-  // Actualizar notificación para usuarios
-  actualizarNotificacionNovedades();
-  
-  // Si estamos en la sección de novedades, actualizarla también
-  if(document.getElementById('novedades').style.display === 'block') {
-    cargarNovedades();
-  }
-}
-
-/* ===========================
-   Notificaciones de Novedades
-   =========================== */
-function actualizarNotificacionNovedades() {
-  if (usuarioActual && !usuarioActual.admin) {
-    const badge = document.getElementById('novedades-badge');
-    if (novedades.length > 0) {
-      badge.textContent = novedades.length;
-      badge.style.display = 'flex';
-    } else {
-      badge.style.display = 'none';
-    }
-  }
-}
-
-/* ===========================
-   Admin: historial general
-   =========================== */
-function cargarHistorialGeneral(){
-  const tbody = document.getElementById('historial-general-body');
-  if(!tbody) return; // se usa sólo si la sección admin-historial está presente
-}
-
-/* ===========================
-   Admin: actualización resumen
-   =========================== */
-function actualizarAdminDashboard(){
-  document.getElementById('total-usuarios').textContent = usuarios.filter(u=>!u.admin).length;
-  document.getElementById('total-registros').textContent = registros.length;
-  document.getElementById('total-actividades').textContent = actividades.length;
-  document.getElementById('total-novedades').textContent = novedades.length;
-}
-
-/* ===========================
-   Export CSV
-   =========================== */
-function exportarCSV(){
-  if(!registros.length){ mostrarPopup('No hay registros para exportar','error'); return; }
-  const rows = [
-    ['legajo','nombre','actividad','fecha','ingreso','salida','horas','movil','estadoMovil','observaciones','observacionesSalida']
-  ];
-  registros.forEach(r=>{
-    const usuario = usuarios.find(u=> u.legajo === r.legajo);
-    rows.push([
-      r.legajo,
-      usuario ? usuario.nombre : '',
-      r.actividad || '',
-      r.fecha || '',
-      r.ingreso || '',
-      r.salida || '',
-      r.horas || '',
-      r.movil || '',
-      r.estadoMovil || '',
-      (r.observaciones || '').replace(/\n/g,' '),
-      (r.observacionesSalida || '').replace(/\n/g,' ')
-    ]);
-  });
-
-  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `registros_bomberos_${new Date().toISOString().slice(0,10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  mostrarPopup('CSV descargado', 'success');
-}
-
-/* ===========================
-   Util: confirmar eliminar (ejemplo)
-   =========================== */
-function confirmEliminarActividad(id){
-  if(confirm('¿Eliminar actividad?')) eliminarActividad(id);
-}
-
-/* ===========================
-   Seguridad mínima: cerrar sesión
-   =========================== */
-document.getElementById('logout-top').addEventListener('click', ()=>{
-  localStorage.removeItem(STORAGE.SESSION);
-  location.reload();
-});
-
-</script>
+        
+        if (properties.length === 0) {
+            properties = [
+                {
+                    id: 'property_1',
+                    title: "Casa Moderna en Zona Residencial",
+                    price: "$350,000",
+                    type: "casa",
+                    operation: "venta",
+                    address: "Av. Principal 123, Buenos Aires",
+                    bedrooms: 4,
+                    bathrooms: 3,
+                    area: "250 m²",
+                    description: "Hermosa casa moderna con amplios espacios, jardín y garaje para 2 autos.",
+                    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+                    ownerId: 'user_1',
+                    date: new Date().toISOString()
+                },
+                {
+                    id: 'property_2',
+                    title: "Apartamento en Centro Histórico",
+                    price: "$1,200/mes",
+                    type: "apartamento",
+                    operation: "alquiler",
+                    address: "Calle Colonial 456, Córdoba",
+                    bedrooms: 2,
+                    bathrooms: 2,
+                    area: "120 m²",
+                    description: "Acogedor apartamento en el corazón del centro histórico, cerca de todos los servicios.",
+                    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+                    ownerId: 'user_2',
+                    date: new Date().toISOString()
+                },
+                {
+                    id: 'property_3',
+                    title: "Casa Familiar con Jardín",
+                    price: "$280,000",
+                    type: "casa",
+                    operation: "venta",
+                    address: "Residencial Las Flores, Mendoza",
+                    bedrooms: 3,
+                    bathrooms: 2,
+                    area: "180 m²",
+                    description: "Ideal para familias, cuenta con amplio jardín y área de juegos para niños.",
+                    image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+                    ownerId: 'user_1',
+                    date: new Date().toISOString()
+                },
+                {
+                    id: 'property_4',
+                    title: "Loft Moderno en Edificio Nuevo",
+                    price: "$900/mes",
+                    type: "apartamento",
+                    operation: "alquiler",
+                    address: "Distrito Financiero, Rosario",
+                    bedrooms: 1,
+                    bathrooms: 1,
+                    area: "80 m²",
+                    description: "Moderno loft con acabados de lujo, perfecto para profesionales.",
+                    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+                    ownerId: 'user_2',
+                    date: new Date().toISOString()
+                }
+            ];
+            localStorage.setItem('tucasa_properties', JSON.stringify(properties));
+        }
+        
+        // Lista de ciudades de Argentina para el autocompletado
+        const argentinaCities = [
+            "Buenos Aires", "Córdoba", "Rosario", "Mendoza", "Tucumán", 
+            "La Plata", "Mar del Plata", "Salta", "Santa Fe", "San Juan",
+            "Resistencia", "Santiago del Estero", "Corrientes", "Posadas",
+            "San Salvador de Jujuy", "Neuquén", "Formosa", "Paraná", "San Luis",
+            "Catamarca", "Viedma", "Rawson", "Ushuaia", "Bahía Blanca",
+            "San Miguel de Tucumán", "San Carlos de Bariloche", "Merlo", "Salta",
+            "Quilmes", "Lanús", "Gregorio de Laferrere", "José C. Paz", "Banfield",
+            "González Catán", "San Miguel", "Moreno", "San Fernando del Valle de Catamarca",
+            "Río Cuarto", "Comodoro Rivadavia", "San Nicolás de los Arroyos", "Villa Mercedes"
+        ];
+        
+        // Variables para el sistema de chat
+        let currentChatWith = null;
+        let currentConversationId = null;
+        
+        // ============================
+        // FUNCIONES PRINCIPALES
+        // ============================
+        
+        // Configurar el autocompletado de ciudades
+        function setupCityAutocomplete() {
+            const searchInput = document.getElementById('searchInput');
+            const suggestions = document.getElementById('suggestions');
+            
+            if (!searchInput || !suggestions) return;
+            
+            searchInput.addEventListener('input', function() {
+                const value = this.value.toLowerCase();
+                suggestions.innerHTML = '';
+                
+                if (value.length > 1) {
+                    const filteredCities = argentinaCities.filter(city => 
+                        city.toLowerCase().includes(value)
+                    );
+                    
+                    if (filteredCities.length > 0) {
+                        suggestions.style.display = 'block';
+                        
+                        filteredCities.forEach(city => {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-item';
+                            div.textContent = city;
+                            div.addEventListener('click', function() {
+                                searchInput.value = city;
+                                suggestions.style.display = 'none';
+                            });
+                            suggestions.appendChild(div);
+                        });
+                    } else {
+                        suggestions.style.display = 'none';
+                    }
+                } else {
+                    suggestions.style.display = 'none';
+                }
+            });
+            
+            // Ocultar sugerencias al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (e.target !== searchInput) {
+                    suggestions.style.display = 'none';
+                }
+            });
+            
+            // Configurar botón de búsqueda
+            const searchBtn = document.getElementById('searchBtn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', function() {
+                    const searchValue = searchInput.value.trim();
+                    if (searchValue) {
+                        // Redirigir a la sección de propiedades con la búsqueda
+                        showPropertiesSection();
+                        filterPropertiesByLocation(searchValue);
+                    }
+                });
+            }
+            
+            // Permitir búsqueda con Enter
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const searchValue = searchInput.value.trim();
+                    if (searchValue) {
+                        // Redirigir a la sección de propiedades con la búsqueda
+                        showPropertiesSection();
+                        filterPropertiesByLocation(searchValue);
+                    }
+                }
+            });
+        }
+        
+        // Mostrar sección de propiedades
+        function showPropertiesSection() {
+            document.getElementById('inicio').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('profile').style.display = 'none';
+            document.getElementById('propiedades').style.display = 'block';
+        }
+        
+        // Mostrar sección de inicio
+        function showInicioSection() {
+            document.getElementById('inicio').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('profile').style.display = 'none';
+            document.getElementById('propiedades').style.display = 'none';
+        }
+        
+        // Mostrar sección de perfil
+        function showProfileSection() {
+            document.getElementById('inicio').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('profile').style.display = 'block';
+            document.getElementById('propiedades').style.display = 'none';
+        }
+        
+        // Mostrar sección de dashboard
+        function showDashboardSection() {
+            document.getElementById('inicio').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('profile').style.display = 'none';
+            document.getElementById('propiedades').style.display = 'none';
+        }
+        
+        // Filtrar propiedades por ubicación
+        function filterPropertiesByLocation(location) {
+            const filteredProperties = properties.filter(property => 
+                property.address.toLowerCase().includes(location.toLowerCase())
+            );
+            
+            // Actualizar título y subtítulo
+            document.getElementById('propertiesTitle').textContent = `Propiedades en ${location}`;
+            document.getElementById('propertiesSubtitle').textContent = `Resultados de búsqueda para "${location}"`;
+            
+            displayProperties(filteredProperties);
+            
+            // Mostrar mensaje si no hay resultados
+            const propertiesGrid = document.getElementById('propertiesGrid');
+            if (filteredProperties.length === 0) {
+                propertiesGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <h3>No se encontraron propiedades en ${location}</h3>
+                        <p>Intenta con otra ubicación o <a href="#" id="showAllProperties">ver todas las propiedades</a></p>
+                    </div>
+                `;
+                
+                document.getElementById('showAllProperties').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loadAllProperties();
+                });
+            }
+        }
+        
+        // Cargar todas las propiedades
+        function loadAllProperties() {
+            document.getElementById('propertiesTitle').textContent = 'Todas las Propiedades';
+            document.getElementById('propertiesSubtitle').textContent = 'Explora todas nuestras propiedades en venta y alquiler';
+            displayProperties(properties);
+        }
+        
+        // Mostrar propiedades en la página principal
+        function displayProperties(propertiesToShow) {
+            const propertiesGrid = document.getElementById('propertiesGrid');
+            if (!propertiesGrid) return;
+            
+            propertiesGrid.innerHTML = '';
+            
+            if (propertiesToShow.length === 0) {
+                propertiesGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">No hay propiedades disponibles en este momento.</p>';
+                return;
+            }
+            
+            propertiesToShow.forEach(property => {
+                const owner = users.find(user => user.id === property.ownerId);
+                if (!owner) return;
+                
+                const propertyCard = document.createElement('div');
+                propertyCard.className = 'property-card';
+                propertyCard.innerHTML = `
+                    <div class="property-badge ${property.operation === 'venta' ? 'badge-sale' : 'badge-rent'}">
+                        ${property.operation === 'venta' ? 'En Venta' : 'En Alquiler'}
+                    </div>
+                    <div class="property-image" style="background-image: url('${property.image}')"></div>
+                    <div class="property-details">
+                        <div class="property-price">${property.price}</div>
+                        <h3>${property.title}</h3>
+                        <p class="property-address">${property.address}</p>
+                        <div class="property-features">
+                            <span>${property.bedrooms} Habitaciones</span>
+                            <span>${property.bathrooms} Baños</span>
+                            <span>${property.area}</span>
+                        </div>
+                        <p class="property-description">${property.description}</p>
+                        <div class="property-owner">
+                            <div class="owner-avatar" data-user-id="${owner.id}">${owner.name.charAt(0)}</div>
+                            <div class="owner-info">
+                                <h4 data-user-id="${owner.id}">${owner.name}</h4>
+                                <p>${owner.phone}</p>
+                            </div>
+                        </div>
+                        <div class="contact-buttons">
+                            <button class="btn btn-primary btn-sm contact-owner" data-owner-id="${owner.id}">Contactar</button>
+                            <button class="btn btn-outline btn-sm view-profile" data-user-id="${owner.id}">Ver Perfil</button>
+                        </div>
+                    </div>
+                `;
+                propertiesGrid.appendChild(propertyCard);
+                
+                // Registrar vista de la propiedad
+                registerPropertyView(property.id);
+            });
+            
+            // Agregar event listeners para los botones de contacto y ver perfil
+            document.querySelectorAll('.contact-owner').forEach(button => {
+                button.addEventListener('click', function() {
+                    const ownerId = this.getAttribute('data-owner-id');
+                    if (currentUser) {
+                        openChat(ownerId);
+                    } else {
+                        document.getElementById('authModal').style.display = 'flex';
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.view-profile').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    showUserProfile(userId);
+                });
+            });
+            
+            document.querySelectorAll('.owner-avatar, .owner-info h4').forEach(element => {
+                element.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    showUserProfile(userId);
+                });
+            });
+        }
+        
+        // Cargar propiedades del usuario en el dashboard
+        function loadUserProperties() {
+            if (!currentUser) return;
+            
+            const myPropertiesGrid = document.getElementById('myPropertiesGrid');
+            if (!myPropertiesGrid) return;
+            
+            myPropertiesGrid.innerHTML = '';
+            
+            const userProperties = properties.filter(property => property.ownerId === currentUser.id);
+            
+            if (userProperties.length === 0) {
+                myPropertiesGrid.innerHTML = '<p>No tienes propiedades publicadas. <button class="btn btn-primary" id="addFirstPropertyBtn">Agregar tu primera propiedad</button></p>';
+                
+                const addFirstPropertyBtn = document.getElementById('addFirstPropertyBtn');
+                if (addFirstPropertyBtn) {
+                    addFirstPropertyBtn.addEventListener('click', function() {
+                        document.getElementById('authModal').style.display = 'none';
+                        openPropertyModal();
+                    });
+                }
+                return;
+            }
+            
+            userProperties.forEach(property => {
+                const views = propertyViews[property.id] ? propertyViews[property.id].length : 0;
+                const propertyCard = document.createElement('div');
+                propertyCard.className = 'property-card';
+                propertyCard.innerHTML = `
+                    <div class="property-badge ${property.operation === 'venta' ? 'badge-sale' : 'badge-rent'}">
+                        ${property.operation === 'venta' ? 'En Venta' : 'En Alquiler'}
+                    </div>
+                    <div class="property-image" style="background-image: url('${property.image}')"></div>
+                    <div class="property-details">
+                        <div class="property-price">${property.price}</div>
+                        <h3>${property.title}</h3>
+                        <p class="property-address">${property.address}</p>
+                        <div class="property-features">
+                            <span>${property.bedrooms} Habitaciones</span>
+                            <span>${property.bathrooms} Baños</span>
+                            <span>${property.area}</span>
+                        </div>
+                        <p><strong>Vistas:</strong> ${views}</p>
+                        <div class="property-actions">
+                            <button class="btn btn-outline edit-property" data-id="${property.id}">Editar</button>
+                            <button class="btn btn-danger delete-property" data-id="${property.id}">Eliminar</button>
+                        </div>
+                    </div>
+                `;
+                myPropertiesGrid.appendChild(propertyCard);
+            });
+            
+            // Agregar event listeners para los botones de editar y eliminar
+            document.querySelectorAll('.edit-property').forEach(button => {
+                button.addEventListener('click', function() {
+                    const propertyId = this.getAttribute('data-id');
+                    editProperty(propertyId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-property').forEach(button => {
+                button.addEventListener('click', function() {
+                    const propertyId = this.getAttribute('data-id');
+                    deleteProperty(propertyId);
+                });
+            });
+        }
+        
+        // Cargar estadísticas del usuario
+        function loadUserStatistics() {
+            if (!currentUser) return;
+            
+            const userProperties = properties.filter(property => property.ownerId === currentUser.id);
+            const totalProperties = userProperties.length;
+            
+            let totalViews = 0;
+            let todayViews = 0;
+            let interestedUsers = new Set();
+            
+            const today = new Date().toDateString();
+            
+            userProperties.forEach(property => {
+                if (propertyViews[property.id]) {
+                    totalViews += propertyViews[property.id].length;
+                    
+                    propertyViews[property.id].forEach(view => {
+                        const viewDate = new Date(view.timestamp).toDateString();
+                        if (viewDate === today) {
+                            todayViews++;
+                        }
+                        
+                        interestedUsers.add(view.userId);
+                    });
+                }
+            });
+            
+            document.getElementById('totalProperties').textContent = totalProperties;
+            document.getElementById('totalViews').textContent = totalViews;
+            document.getElementById('todayViews').textContent = todayViews;
+            document.getElementById('interestedUsers').textContent = interestedUsers.size;
+            
+            // Actualizar gráfico
+            updateViewsChart(userProperties);
+        }
+        
+        // Cargar visitantes de las propiedades del usuario
+        function loadPropertyViewers() {
+            if (!currentUser) return;
+            
+            const viewersList = document.getElementById('viewersList');
+            if (!viewersList) return;
+            
+            viewersList.innerHTML = '';
+            
+            const userProperties = properties.filter(property => property.ownerId === currentUser.id);
+            let allViewers = [];
+            
+            userProperties.forEach(property => {
+                if (propertyViews[property.id]) {
+                    propertyViews[property.id].forEach(view => {
+                        const viewer = users.find(user => user.id === view.userId);
+                        if (viewer) {
+                            allViewers.push({
+                                user: viewer,
+                                property: property,
+                                timestamp: view.timestamp
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // Ordenar por fecha (más reciente primero)
+            allViewers.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            if (allViewers.length === 0) {
+                viewersList.innerHTML = '<p style="padding: 20px; text-align: center;">Aún no hay visitantes en tus propiedades.</p>';
+                return;
+            }
+            
+            allViewers.forEach(view => {
+                const viewerItem = document.createElement('div');
+                viewerItem.className = 'viewer-item';
+                viewerItem.innerHTML = `
+                    <div class="viewer-avatar">${view.user.name.charAt(0)}</div>
+                    <div class="viewer-info">
+                        <h4>${view.user.name}</h4>
+                        <p>Vio: ${view.property.title}</p>
+                    </div>
+                    <div class="viewer-date">${new Date(view.timestamp).toLocaleDateString()}</div>
+                `;
+                viewersList.appendChild(viewerItem);
+            });
+        }
+        
+        // Actualizar gráfico de vistas
+        function updateViewsChart(userProperties) {
+            const ctx = document.getElementById('viewsChart');
+            if (!ctx) return;
+            
+            // Destruir gráfico anterior si existe
+            if (window.viewsChart) {
+                window.viewsChart.destroy();
+            }
+            
+            const propertyNames = userProperties.map(property => {
+                // Acortar títulos largos para el gráfico
+                return property.title.length > 20 ? property.title.substring(0, 20) + '...' : property.title;
+            });
+            
+            const viewCounts = userProperties.map(property => 
+                propertyViews[property.id] ? propertyViews[property.id].length : 0
+            );
+            
+            window.viewsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: propertyNames,
+                    datasets: [{
+                        label: 'Vistas por propiedad',
+                        data: viewCounts,
+                        backgroundColor: '#1A5276',
+                        borderColor: '#154360',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Registrar vista de propiedad
+        function registerPropertyView(propertyId) {
+            if (!currentUser) return;
+            
+            // Si no existe un array para esta propiedad, crearlo
+            if (!propertyViews[propertyId]) {
+                propertyViews[propertyId] = [];
+            }
+            
+            // Verificar si el usuario ya vio esta propiedad hoy
+            const today = new Date().toDateString();
+            const userAlreadyViewedToday = propertyViews[propertyId].some(
+                view => view.userId === currentUser.id && 
+                new Date(view.timestamp).toDateString() === today
+            );
+            
+            // Si no la ha visto hoy, agregar el registro
+            if (!userAlreadyViewedToday) {
+                propertyViews[propertyId].push({
+                    userId: currentUser.id,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Guardar en localStorage
+                localStorage.setItem('tucasa_property_views', JSON.stringify(propertyViews));
+            }
+        }
+        
+        // ============================
+        // SISTEMA DE PERFIL
+        // ============================
+        
+        // Mostrar perfil de usuario
+        function showUserProfile(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            const userProperties = properties.filter(property => property.ownerId === userId);
+            
+            // Actualizar encabezado del perfil
+            const profileHeader = document.getElementById('profileHeader');
+            profileHeader.innerHTML = `
+                <div class="profile-avatar">${user.name.charAt(0)}</div>
+                <div class="profile-info">
+                    <h2>${user.name}</h2>
+                    <p>${user.company || 'Usuario de TUCASA'}</p>
+                    <p>${user.bio || 'Este usuario aún no ha completado su biografía.'}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Teléfono:</strong> ${user.phone}</p>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="value">${userProperties.length}</div>
+                            <div class="label">Propiedades</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="value">${userProperties.filter(p => p.operation === 'venta').length}</div>
+                            <div class="label">En Venta</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="value">${userProperties.filter(p => p.operation === 'alquiler').length}</div>
+                            <div class="label">En Alquiler</div>
+                        </div>
+                    </div>
+                    ${currentUser && currentUser.id === userId ? `
+                        <div class="profile-actions">
+                            <button class="btn btn-primary" id="addPropertyFromProfile">Agregar Propiedad</button>
+                        </div>
+                    ` : ''}
+                    ${currentUser && currentUser.id !== userId ? `
+                        <div class="profile-actions">
+                            <button class="btn btn-primary" id="contactUserProfile" data-user-id="${userId}">Contactar</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Actualizar título de propiedades
+            document.getElementById('profilePropertiesTitle').textContent = `Propiedades de ${user.name}`;
+            document.getElementById('profilePropertiesSubtitle').textContent = `Todas las propiedades publicadas por ${user.name}`;
+            
+            // Cargar propiedades del perfil
+            const profilePropertiesGrid = document.getElementById('profilePropertiesGrid');
+            profilePropertiesGrid.innerHTML = '';
+            
+            if (userProperties.length === 0) {
+                profilePropertiesGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Este usuario aún no tiene propiedades publicadas.</p>';
+            } else {
+                userProperties.forEach(property => {
+                    const propertyCard = document.createElement('div');
+                    propertyCard.className = 'property-card';
+                    propertyCard.innerHTML = `
+                        <div class="property-badge ${property.operation === 'venta' ? 'badge-sale' : 'badge-rent'}">
+                            ${property.operation === 'venta' ? 'En Venta' : 'En Alquiler'}
+                        </div>
+                        <div class="property-image" style="background-image: url('${property.image}')"></div>
+                        <div class="property-details">
+                            <div class="property-price">${property.price}</div>
+                            <h3>${property.title}</h3>
+                            <p class="property-address">${property.address}</p>
+                            <div class="property-features">
+                                <span>${property.bedrooms} Habitaciones</span>
+                                <span>${property.bathrooms} Baños</span>
+                                <span>${property.area}</span>
+                            </div>
+                            <p class="property-description">${property.description}</p>
+                            ${currentUser && currentUser.id !== userId ? `
+                                <div class="contact-buttons">
+                                    <button class="btn btn-primary btn-sm contact-owner-profile" data-owner-id="${user.id}">Contactar</button>
+                                </div>
+                            ` : ''}
+                            ${currentUser && currentUser.id === userId ? `
+                                <div class="property-actions">
+                                    <button class="btn btn-outline edit-property" data-id="${property.id}">Editar</button>
+                                    <button class="btn btn-danger delete-property" data-id="${property.id}">Eliminar</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    profilePropertiesGrid.appendChild(propertyCard);
+                });
+            }
+            
+            // Mostrar sección de perfil
+            showProfileSection();
+            
+            // Agregar event listeners para los botones de contacto en el perfil
+            const contactUserProfileBtn = document.getElementById('contactUserProfile');
+            if (contactUserProfileBtn) {
+                contactUserProfileBtn.addEventListener('click', function() {
+                    const ownerId = this.getAttribute('data-user-id');
+                    if (currentUser) {
+                        openChat(ownerId);
+                    } else {
+                        document.getElementById('authModal').style.display = 'flex';
+                    }
+                });
+            }
+            
+            // Agregar event listener para agregar propiedad desde el perfil
+            const addPropertyFromProfileBtn = document.getElementById('addPropertyFromProfile');
+            if (addPropertyFromProfileBtn) {
+                addPropertyFromProfileBtn.addEventListener('click', function() {
+                    openPropertyModal();
+                });
+            }
+            
+            document.querySelectorAll('.contact-owner-profile').forEach(button => {
+                button.addEventListener('click', function() {
+                    const ownerId = this.getAttribute('data-owner-id');
+                    if (currentUser) {
+                        openChat(ownerId);
+                    } else {
+                        document.getElementById('authModal').style.display = 'flex';
+                    }
+                });
+            });
+            
+            // Agregar event listeners para los botones de editar y eliminar en el perfil
+            document.querySelectorAll('.edit-property').forEach(button => {
+                button.addEventListener('click', function() {
+                    const propertyId = this.getAttribute('data-id');
+                    editProperty(propertyId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-property').forEach(button => {
+                button.addEventListener('click', function() {
+                    const propertyId = this.getAttribute('data-id');
+                    deleteProperty(propertyId);
+                });
+            });
+        }
+        
+        // Mostrar perfil del usuario actual
+        function showCurrentUserProfile() {
+            if (!currentUser) {
+                document.getElementById('authModal').style.display = 'flex';
+                return;
+            }
+            
+            showUserProfile(currentUser.id);
+        }
+        
+        // ============================
+        // SISTEMA DE CHAT
+        // ============================
+        
+        // Configurar sistema de chat
+        function setupChatSystem() {
+            const chatToggle = document.getElementById('chatToggle');
+            const chatList = document.getElementById('chatList');
+            const chatContainer = document.getElementById('chatContainer');
+            const chatClose = document.getElementById('chatClose');
+            const chatSend = document.getElementById('chatSend');
+            const chatInput = document.getElementById('chatInput');
+            
+            if (!chatToggle || !chatList || !chatContainer || !chatClose || !chatSend || !chatInput) return;
+            
+            // Alternar lista de conversaciones
+            chatToggle.addEventListener('click', function() {
+                if (currentUser) {
+                    chatList.style.display = chatList.style.display === 'flex' ? 'none' : 'flex';
+                    chatContainer.style.display = 'none';
+                } else {
+                    document.getElementById('authModal').style.display = 'flex';
+                }
+            });
+            
+            // Cerrar chat
+            chatClose.addEventListener('click', function() {
+                chatContainer.style.display = 'none';
+                currentChatWith = null;
+                currentConversationId = null;
+            });
+            
+            // Enviar mensaje
+            chatSend.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Cerrar al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!chatList.contains(e.target) && !chatToggle.contains(e.target) && chatList.style.display === 'flex') {
+                    chatList.style.display = 'none';
+                }
+            });
+        }
+        
+        // Abrir chat con un usuario
+        function openChat(userId) {
+            if (!currentUser) return;
+            
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            currentChatWith = user;
+            
+            // Generar ID de conversación
+            const participants = [currentUser.id, user.id].sort();
+            currentConversationId = `conv_${participants.join('_')}`;
+            
+            // Actualizar interfaz de chat
+            document.getElementById('chatWithUser').textContent = `Chat con ${user.name}`;
+            document.getElementById('chatMessages').innerHTML = '';
+            document.getElementById('chatInput').value = '';
+            
+            // Mostrar chat y ocultar lista
+            document.getElementById('chatList').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'flex';
+            
+            // Cargar mensajes
+            loadMessages();
+            
+            // Actualizar lista de conversaciones
+            updateConversationsList();
+        }
+        
+        // Enviar mensaje
+        function sendMessage() {
+            if (!currentUser || !currentChatWith || !currentConversationId) return;
+            
+            const chatInput = document.getElementById('chatInput');
+            const messageText = chatInput.value.trim();
+            
+            if (!messageText) return;
+            
+            // Crear mensaje
+            const message = {
+                id: 'msg_' + Date.now(),
+                senderId: currentUser.id,
+                text: messageText,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Agregar mensaje a la conversación
+            if (!conversations[currentConversationId]) {
+                conversations[currentConversationId] = {
+                    participants: [currentUser.id, currentChatWith.id],
+                    messages: []
+                };
+            }
+            
+            conversations[currentConversationId].messages.push(message);
+            
+            // Guardar en localStorage
+            localStorage.setItem('tucasa_conversations', JSON.stringify(conversations));
+            
+            // Actualizar interfaz
+            appendMessage(message);
+            chatInput.value = '';
+            
+            // Actualizar lista de conversaciones
+            updateConversationsList();
+        }
+        
+        // Cargar mensajes en el chat
+        function loadMessages() {
+            if (!currentConversationId || !conversations[currentConversationId]) return;
+            
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            conversations[currentConversationId].messages.forEach(message => {
+                appendMessage(message);
+            });
+            
+            // Scroll al final
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Agregar mensaje a la interfaz
+        function appendMessage(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageElement = document.createElement('div');
+            
+            const isSent = message.senderId === currentUser.id;
+            messageElement.className = `message ${isSent ? 'message-sent' : 'message-received'}`;
+            
+            const time = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageElement.innerHTML = `
+                <div>${message.text}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatMessages.appendChild(messageElement);
+            
+            // Scroll al final
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Actualizar lista de conversaciones
+        function updateConversationsList() {
+            if (!currentUser) return;
+            
+            const chatList = document.getElementById('chatList');
+            const existingItems = chatList.querySelectorAll('.chat-item');
+            existingItems.forEach(item => item.remove());
+            
+            // Obtener conversaciones del usuario actual
+            const userConversations = Object.entries(conversations).filter(([id, conv]) => 
+                conv.participants.includes(currentUser.id)
+            );
+            
+            if (userConversations.length === 0) {
+                const noConversations = document.createElement('div');
+                noConversations.className = 'chat-item';
+                noConversations.style.justifyContent = 'center';
+                noConversations.innerHTML = '<p style="color: #999; text-align: center;">No hay conversaciones</p>';
+                chatList.appendChild(noConversations);
+                return;
+            }
+            
+            // Ordenar conversaciones por el último mensaje
+            userConversations.sort((a, b) => {
+                const aLastMessage = a[1].messages[a[1].messages.length - 1];
+                const bLastMessage = b[1].messages[b[1].messages.length - 1];
+                
+                if (!aLastMessage) return 1;
+                if (!bLastMessage) return -1;
+                
+                return new Date(bLastMessage.timestamp) - new Date(aLastMessage.timestamp);
+            });
+            
+            // Agregar conversaciones a la lista
+            userConversations.forEach(([id, conv]) => {
+                const otherUserId = conv.participants.find(p => p !== currentUser.id);
+                const otherUser = users.find(u => u.id === otherUserId);
+                
+                if (!otherUser) return;
+                
+                const lastMessage = conv.messages[conv.messages.length - 1];
+                const lastMessageText = lastMessage ? lastMessage.text : 'No hay mensajes';
+                const lastMessageTime = lastMessage ? new Date(lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                
+                const chatItem = document.createElement('div');
+                chatItem.className = 'chat-item';
+                chatItem.setAttribute('data-conversation-id', id);
+                chatItem.setAttribute('data-user-id', otherUserId);
+                
+                chatItem.innerHTML = `
+                    <div class="chat-item-avatar">${otherUser.name.charAt(0)}</div>
+                    <div class="chat-item-info">
+                        <h4>${otherUser.name}</h4>
+                        <p>${lastMessageText}</p>
+                    </div>
+                    <div class="chat-item-time">${lastMessageTime}</div>
+                `;
+                
+                chatItem.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    openChat(userId);
+                });
+                
+                chatList.appendChild(chatItem);
+            });
+        }
+        
+        // ============================
+        // AUTENTICACIÓN
+        // ============================
+        
+        // Configurar modal de autenticación
+        function setupAuthModal() {
+            const authModal = document.getElementById('authModal');
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const closeModal = document.getElementById('closeModal');
+            const authTabs = document.querySelectorAll('.auth-tab');
+            const loginSubmit = document.getElementById('loginSubmit');
+            const registerSubmit = document.getElementById('registerSubmit');
+            
+            if (!authModal || !loginBtn || !registerBtn || !closeModal) {
+                console.error('No se encontraron elementos del modal de autenticación');
+                return;
+            }
+            
+            // Abrir modal al hacer clic en Iniciar Sesión
+            loginBtn.addEventListener('click', function() {
+                authModal.style.display = 'flex';
+                switchAuthTab('login');
+            });
+            
+            // Abrir modal al hacer clic en Registrarse
+            registerBtn.addEventListener('click', function() {
+                authModal.style.display = 'flex';
+                switchAuthTab('register');
+            });
+            
+            // Cerrar modal
+            closeModal.addEventListener('click', function() {
+                authModal.style.display = 'none';
+            });
+            
+            // Cerrar modal al hacer clic fuera
+            window.addEventListener('click', function(event) {
+                if (event.target === authModal) {
+                    authModal.style.display = 'none';
+                }
+            });
+            
+            // Cambiar pestañas
+            authTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchAuthTab(tabName);
+                });
+            });
+            
+            // Manejo de inicio de sesión
+            if (loginSubmit) {
+                loginSubmit.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    handleLogin();
+                });
+            }
+            
+            // Manejo de registro
+            if (registerSubmit) {
+                registerSubmit.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    handleRegister();
+                });
+            }
+            
+            // Simular inicio de sesión con Google
+            const googleLogin = document.getElementById('googleLogin');
+            const googleRegister = document.getElementById('googleRegister');
+            
+            if (googleLogin) {
+                googleLogin.addEventListener('click', function() {
+                    handleGoogleAuth();
+                });
+            }
+            
+            if (googleRegister) {
+                googleRegister.addEventListener('click', function() {
+                    handleGoogleAuth();
+                });
+            }
+        }
+        
+        // Función para cambiar pestañas de autenticación
+        function switchAuthTab(tabName) {
+            // Remover clase active de todas las pestañas
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Ocultar todos los formularios
+            document.querySelectorAll('.auth-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            
+            // Activar pestaña seleccionada
+            document.querySelector(`.auth-tab[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Mostrar formulario seleccionado
+            document.getElementById(`${tabName}Form`).classList.add('active');
+        }
+        
+        // Manejar inicio de sesión
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showNotification('Por favor, completa todos los campos', 'error');
+                return;
+            }
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('tucasa_current_user', JSON.stringify(currentUser));
+                document.getElementById('authModal').style.display = 'none';
+                updateUIForLoggedInUser();
+                showNotification('¡Bienvenido de nuevo!', 'success');
+            } else {
+                showNotification('Credenciales incorrectas. Intenta nuevamente.', 'error');
+            }
+        }
+        
+        // Manejar registro
+        function handleRegister() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (!name || !email || !phone || !password || !confirmPassword) {
+                showNotification('Por favor, completa todos los campos', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showNotification('Las contraseñas no coinciden.', 'error');
+                return;
+            }
+            
+            if (users.find(u => u.email === email)) {
+                showNotification('Este correo electrónico ya está registrado.', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: 'user_' + Date.now(),
+                name: name,
+                email: email,
+                phone: phone,
+                password: password,
+                registrationDate: new Date().toISOString(),
+                bio: '',
+                company: ''
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('tucasa_users', JSON.stringify(users));
+            
+            currentUser = newUser;
+            localStorage.setItem('tucasa_current_user', JSON.stringify(currentUser));
+            
+            document.getElementById('authModal').style.display = 'none';
+            updateUIForLoggedInUser();
+            showNotification('¡Cuenta creada exitosamente!', 'success');
+        }
+        
+        // Manejar autenticación con Google (simulada)
+        function handleGoogleAuth() {
+            const user = {
+                id: 'user_google_' + Date.now(),
+                name: 'Usuario Google',
+                email: 'google@example.com',
+                phone: '+1 000 000 0000',
+                loginMethod: 'google',
+                bio: 'Usuario registrado con Google',
+                company: ''
+            };
+            
+            // Verificar si el usuario ya existe
+            let existingUser = users.find(u => u.email === user.email);
+            if (!existingUser) {
+                users.push(user);
+                localStorage.setItem('tucasa_users', JSON.stringify(users));
+                existingUser = user;
+            }
+            
+            currentUser = existingUser;
+            localStorage.setItem('tucasa_current_user', JSON.stringify(currentUser));
+            document.getElementById('authModal').style.display = 'none';
+            updateUIForLoggedInUser();
+            showNotification('¡Autenticación exitosa!', 'success');
+        }
+        
+        // ============================
+        // GESTIÓN DE PROPIEDADES
+        // ============================
+        
+        // Configurar modal de propiedades
+        function setupPropertyModal() {
+            const propertyModal = document.getElementById('propertyModal');
+            const closePropertyModal = document.getElementById('closePropertyModal');
+            const propertyForm = document.getElementById('propertyForm');
+            const addPropertyBtn = document.getElementById('addPropertyBtn');
+            
+            if (!propertyModal || !closePropertyModal || !propertyForm || !addPropertyBtn) {
+                console.error('No se encontraron elementos del modal de propiedades');
+                return;
+            }
+            
+            // Abrir modal para agregar propiedad
+            addPropertyBtn.addEventListener('click', function() {
+                document.getElementById('propertyModalTitle').textContent = 'Agregar Nueva Propiedad';
+                propertyForm.reset();
+                propertyModal.style.display = 'flex';
+            });
+            
+            // Cerrar modal
+            closePropertyModal.addEventListener('click', function() {
+                propertyModal.style.display = 'none';
+            });
+            
+            // Cerrar modal al hacer clic fuera
+            window.addEventListener('click', function(event) {
+                if (event.target === propertyModal) {
+                    propertyModal.style.display = 'none';
+                }
+            });
+            
+            // Manejar envío del formulario
+            propertyForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveProperty();
+            });
+        }
+        
+        // Abrir modal de propiedad para edición
+        function openPropertyModal(property = null) {
+            const propertyModal = document.getElementById('propertyModal');
+            const propertyForm = document.getElementById('propertyForm');
+            
+            if (property) {
+                document.getElementById('propertyModalTitle').textContent = 'Editar Propiedad';
+                document.getElementById('propertyTitle').value = property.title;
+                document.getElementById('propertyType').value = property.type;
+                document.getElementById('propertyOperation').value = property.operation;
+                document.getElementById('propertyPrice').value = property.price.replace(/\D/g, '');
+                document.getElementById('propertyAddress').value = property.address;
+                document.getElementById('propertyBedrooms').value = property.bedrooms;
+                document.getElementById('propertyBathrooms').value = property.bathrooms;
+                document.getElementById('propertyArea').value = property.area.replace(/\D/g, '');
+                document.getElementById('propertyDescription').value = property.description;
+                document.getElementById('propertyImage').value = property.image;
+                
+                // Guardar el ID de la propiedad que se está editando
+                propertyForm.setAttribute('data-edit-id', property.id);
+            } else {
+                document.getElementById('propertyModalTitle').textContent = 'Agregar Nueva Propiedad';
+                propertyForm.reset();
+                propertyForm.removeAttribute('data-edit-id');
+            }
+            
+            propertyModal.style.display = 'flex';
+        }
+        
+        // Guardar propiedad (nueva o editada)
+        function saveProperty() {
+            const propertyForm = document.getElementById('propertyForm');
+            const editId = propertyForm.getAttribute('data-edit-id');
+            
+            const title = document.getElementById('propertyTitle').value;
+            const type = document.getElementById('propertyType').value;
+            const operation = document.getElementById('propertyOperation').value;
+            const price = document.getElementById('propertyPrice').value;
+            const address = document.getElementById('propertyAddress').value;
+            const bedrooms = document.getElementById('propertyBedrooms').value;
+            const bathrooms = document.getElementById('propertyBathrooms').value;
+            const area = document.getElementById('propertyArea').value;
+            const description = document.getElementById('propertyDescription').value;
+            const image = document.getElementById('propertyImage').value;
+            
+            if (!title || !price || !address || !bedrooms || !bathrooms || !area || !description || !image) {
+                showNotification('Por favor, completa todos los campos obligatorios', 'error');
+                return;
+            }
+            
+            const propertyData = {
+                title: title,
+                type: type,
+                operation: operation,
+                price: operation === 'venta' ? '$' + parseInt(price).toLocaleString() : '$' + parseInt(price).toLocaleString() + '/mes',
+                address: address,
+                bedrooms: parseInt(bedrooms),
+                bathrooms: parseInt(bathrooms),
+                area: area + ' m²',
+                description: description,
+                image: image,
+                ownerId: currentUser.id,
+                date: new Date().toISOString()
+            };
+            
+            if (editId) {
+                // Editar propiedad existente
+                const index = properties.findIndex(p => p.id === editId);
+                if (index !== -1) {
+                    properties[index] = { ...properties[index], ...propertyData };
+                    showNotification('Propiedad actualizada exitosamente', 'success');
+                }
+            } else {
+                // Agregar nueva propiedad
+                propertyData.id = 'property_' + Date.now();
+                properties.push(propertyData);
+                showNotification('Propiedad agregada exitosamente', 'success');
+            }
+            
+            localStorage.setItem('tucasa_properties', JSON.stringify(properties));
+            document.getElementById('propertyModal').style.display = 'none';
+            
+            // Actualizar las vistas
+            loadAllProperties();
+            loadUserProperties();
+            loadUserStatistics();
+            
+            // Si estamos en el perfil del usuario, actualizarlo
+            if (document.getElementById('profile').style.display === 'block') {
+                showUserProfile(currentUser.id);
+            }
+        }
+        
+        // Editar propiedad
+        function editProperty(propertyId) {
+            const property = properties.find(p => p.id === propertyId);
+            if (property) {
+                openPropertyModal(property);
+            }
+        }
+        
+        // Eliminar propiedad
+        function deleteProperty(propertyId) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta propiedad?')) {
+                properties = properties.filter(p => p.id !== propertyId);
+                localStorage.setItem('tucasa_properties', JSON.stringify(properties));
+                
+                // Actualizar las vistas
+                loadAllProperties();
+                loadUserProperties();
+                loadUserStatistics();
+                
+                // Si estamos en el perfil del usuario, actualizarlo
+                if (document.getElementById('profile').style.display === 'block') {
+                    showUserProfile(currentUser.id);
+                }
+                
+                showNotification('Propiedad eliminada exitosamente', 'success');
+            }
+        }
+        
+        // ============================
+        // INTERFAZ DE USUARIO
+        // ============================
+        
+        // Configurar pestañas del dashboard
+        function setupDashboardTabs() {
+            const dashboardTabs = document.querySelectorAll('.dashboard-tab');
+            
+            dashboardTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    
+                    // Remover clase active de todas las pestañas
+                    dashboardTabs.forEach(t => t.classList.remove('active'));
+                    // Ocultar todos los contenidos
+                    document.querySelectorAll('.dashboard-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Activar pestaña seleccionada
+                    this.classList.add('active');
+                    // Mostrar contenido seleccionado
+                    document.getElementById(`${tabName}Content`).classList.add('active');
+                    
+                    // Actualizar datos si es necesario
+                    if (tabName === 'statistics') {
+                        loadUserStatistics();
+                    } else if (tabName === 'viewers') {
+                        loadPropertyViewers();
+                    }
+                });
+            });
+        }
+        
+        // Actualizar la UI cuando un usuario inicia sesión
+        function updateUIForLoggedInUser() {
+            const authButtons = document.getElementById('authButtons');
+            const venderLink = document.getElementById('venderLink');
+            const dashboardLink = document.getElementById('dashboardLink');
+            const footerVenderLink = document.getElementById('footerVenderLink');
+            const footerProfileLink = document.getElementById('footerProfileLink');
+            
+            if (!authButtons) return;
+            
+            authButtons.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #1A5276; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                        ${currentUser.name.charAt(0)}
+                    </div>
+                    <span>Hola, ${currentUser.name.split(' ')[0]}</span>
+                    <button class="btn btn-outline" id="logoutBtn">Cerrar Sesión</button>
+                </div>
+            `;
+            
+            // Ocultar "Vender" y mostrar "Panel de Control"
+            if (venderLink) {
+                venderLink.style.display = 'none';
+            }
+            
+            if (dashboardLink) {
+                dashboardLink.style.display = 'block';
+            }
+            
+            if (footerVenderLink) {
+                footerVenderLink.textContent = 'Panel de Control';
+                footerVenderLink.href = '#dashboard';
+            }
+            
+            if (footerProfileLink) {
+                footerProfileLink.textContent = 'Mi Perfil';
+                footerProfileLink.href = '#profile';
+            }
+            
+            // Configurar enlace del panel de control
+            if (dashboardLink) {
+                dashboardLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showDashboardSection();
+                });
+            }
+            
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                currentUser = null;
+                localStorage.removeItem('tucasa_current_user');
+                
+                // Restaurar la UI
+                if (venderLink) {
+                    venderLink.style.display = 'block';
+                }
+                
+                if (dashboardLink) {
+                    dashboardLink.style.display = 'none';
+                }
+                
+                if (footerVenderLink) {
+                    footerVenderLink.textContent = 'Vender';
+                    footerVenderLink.href = '#';
+                }
+                
+                if (footerProfileLink) {
+                    footerProfileLink.textContent = 'Perfil';
+                    footerProfileLink.href = '#';
+                }
+                
+                // Mostrar inicio y ocultar otras secciones
+                showInicioSection();
+                
+                location.reload();
+            });
+            
+            // Actualizar lista de conversaciones
+            updateConversationsList();
+            
+            // Cargar datos del usuario
+            loadUserProperties();
+            loadUserStatistics();
+            loadPropertyViewers();
+        }
+        
+        // Mostrar notificación
+        function showNotification(message, type) {
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '15px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.color = 'white';
+            notification.style.fontWeight = '500';
+            notification.style.zIndex = '10000';
+            notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            notification.style.transform = 'translateX(100%)';
+            notification.style.transition = 'transform 0.3s ease';
+            
+            if (type === 'success') {
+                notification.style.backgroundColor = '#27AE60';
+            } else {
+                notification.style.backgroundColor = '#E74C3C';
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Animar entrada
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Remover después de 3 segundos
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // ============================
+        // INICIALIZACIÓN DE LA APLICACIÓN
+        // ============================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Inicializando aplicación...');
+            
+            // Configurar autocompletado de ciudades
+            setupCityAutocomplete();
+            
+            // Configurar sistema de chat
+            setupChatSystem();
+            
+            // Cargar todas las propiedades
+            loadAllProperties();
+            
+            // Configurar modales
+            setupAuthModal();
+            setupPropertyModal();
+            setupDashboardTabs();
+            
+            // Configurar enlaces de navegación
+            const inicioLink = document.getElementById('inicioLink');
+            const propiedadesLink = document.getElementById('propiedadesLink');
+            const venderLink = document.getElementById('venderLink');
+            const profileLink = document.getElementById('profileLink');
+            const footerInicioLink = document.getElementById('footerInicioLink');
+            const footerPropiedadesLink = document.getElementById('footerPropiedadesLink');
+            const footerVenderLink = document.getElementById('footerVenderLink');
+            const footerProfileLink = document.getElementById('footerProfileLink');
+            
+            if (inicioLink) {
+                inicioLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showInicioSection();
+                });
+            }
+            
+            if (propiedadesLink) {
+                propiedadesLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showPropertiesSection();
+                });
+            }
+            
+            if (venderLink && !currentUser) {
+                venderLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('authModal').style.display = 'flex';
+                });
+            }
+            
+            if (profileLink) {
+                profileLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showCurrentUserProfile();
+                });
+            }
+            
+            if (footerInicioLink) {
+                footerInicioLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showInicioSection();
+                });
+            }
+            
+            if (footerPropiedadesLink) {
+                footerPropiedadesLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showPropertiesSection();
+                });
+            }
+            
+            if (footerVenderLink && !currentUser) {
+                footerVenderLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('authModal').style.display = 'flex';
+                });
+            }
+            
+            if (footerProfileLink) {
+                footerProfileLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showCurrentUserProfile();
+                });
+            }
+            
+            // Verificar si hay un usuario logueado
+            if (currentUser) {
+                console.log('Usuario encontrado:', currentUser);
+                updateUIForLoggedInUser();
+            } else {
+                console.log('No hay usuario logueado');
+                // Asegurarse de que solo el inicio esté visible
+                showInicioSection();
+            }
+            
+            // Actualizar propertyViews desde localStorage
+            propertyViews = JSON.parse(localStorage.getItem('tucasa_property_views')) || {};
+            
+            // Actualizar conversations desde localStorage
+            conversations = JSON.parse(localStorage.getItem('tucasa_conversations')) || {};
+        });
+    </script>
 </body>
 </html>
